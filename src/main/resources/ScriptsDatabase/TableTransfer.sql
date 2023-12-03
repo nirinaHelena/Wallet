@@ -1,0 +1,15 @@
+create table "transaction"(
+    id serial primary key,
+    account varchar not null,
+    amount double not null,
+    device varchar(5) not null,
+    to_account varchar not null,
+    labels varchar,
+    "date"  date(now()),
+    "hour" time(now()),
+    beneficiary varchar,
+    note varchar,
+    payment_method varchar not null,
+    payment_status varchar not null,
+    location varchar,
+);
