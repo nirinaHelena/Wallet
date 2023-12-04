@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public abstract class Transaction {
     private Account account;
     private Double amount;
-    private Device device;
+    private Devise device;
     private String label;
     private LocalDate date;
     private LocalDateTime hour;
@@ -25,7 +25,7 @@ public abstract class Transaction {
 
 
     //constructor without date and hour as parameter
-    public Transaction(Account account, Double amount, Device device,
+    public Transaction(Account account, Double amount, Devise device,
                        String label, String note,
                        PaiementMethod paiementMethod,
                        PaiementStatus paiementStatus, String location) {
