@@ -1,4 +1,4 @@
-create table account(
+create table if not exist account(
     id serial primary key,
     username varchar(150) not null,
     email varchar(100) not null,

@@ -13,7 +13,7 @@ public class Transfer extends Transaction{
     private Account beneficiary;
 
     //constructor without parameter date and hour
-    public Transfer(Account account, Double amount, Devise device,
+    public Transfer(Account account, Double amount, Device device,
                     String label, String note,
                     PaiementMethod paiementMethod,
                     PaiementStatus paiementStatus, String location,

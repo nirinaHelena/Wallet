@@ -13,7 +13,7 @@ public class Revenue extends Transaction{
     private Account payer;
 
     //constructor without parameter date and hour
-    public Revenue(Account account, Double amount, Devise device,
+    public Revenue(Account account, Double amount, Device device,
                    String label, String note,
                    PaiementMethod paiementMethod, PaiementStatus paiementStatus,
                    String location, Categories categories, Account payer) {

@@ -1,4 +1,4 @@
-create table "transaction"(
+create table if not exist "transaction"(
     id serial primary key,
     account varchar not null,
     amount double not null,
