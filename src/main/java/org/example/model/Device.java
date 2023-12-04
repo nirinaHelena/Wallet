@@ -11,6 +11,12 @@ import java.io.Serializable;
 @ToString
 @EqualsAndHashCode
 public class Device implements Serializable {
+    private int id;
     private String device;
     private String country;
+
+    public Device(String device, String country) {
+        this.device = device;
+        this.country = country;
+    }
 }
