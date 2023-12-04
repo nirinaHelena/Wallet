@@ -24,6 +24,7 @@ public abstract class Transaction {
     private String location;
 
 
+    //constructor without date and hour as parameter
     public Transaction(Account account, Double amount, Device device,
                        String label, String note,
                        PaiementMethod paiementMethod,
