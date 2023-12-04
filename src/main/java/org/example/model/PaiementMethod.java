@@ -1,2 +1,4 @@
-package org.example.model;public enum PaiementMethod {
+package org.example.model;
+
+public enum PaiementMethod {
 }

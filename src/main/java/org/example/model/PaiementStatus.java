@@ -1,2 +1,4 @@
-package org.example.model;public enum PaiementStatus {
+package org.example.model;
+
+public enum PaiementStatus {
 }

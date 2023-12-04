@@ -1,2 +1,4 @@
-package org.example.model;public class Categories {
+package org.example.model;
+
+public class Categories {
 }

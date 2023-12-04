@@ -1,2 +1,4 @@
-package org.example.model;public enum Categorie {
+package org.example.model;
+
+public enum Categorie {
 }
