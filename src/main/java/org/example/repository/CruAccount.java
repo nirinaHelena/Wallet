@@ -52,7 +52,7 @@ public class CruAccount implements CrudOperationInterface<Account>{
 
             int affected= preparedStatement.executeUpdate();
             if (affected>0){
-                return toSave
+                return toSave;
             }
         }catch (SQLException e){
             e.printStackTrace();
