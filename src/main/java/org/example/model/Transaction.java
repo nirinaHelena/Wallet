@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor
-public abstract class Transaction {
+public class Transaction {
     private Account account;
     private Double amount;
     private Device device;
