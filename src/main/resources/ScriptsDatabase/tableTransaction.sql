@@ -1,0 +1,1 @@
+CREATE TABLE transaction IF EXIST (                             id SERIAL PRIMARY KEY,                             sender_id BIGINT NOT NULL,                             receiver_id BIGINT NOT NULL,                             amount INTEGER NOT NULL);
