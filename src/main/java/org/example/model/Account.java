@@ -28,7 +28,6 @@ public class Account {
     public Account(String accountName, Currency currency, String accountType) {
         this.accountName = accountName;
         this.amount = amountInitial;
-        this.transactionList = new ArrayList<>();
         this.currency = currency;
         this.accountType = accountType;
     }
