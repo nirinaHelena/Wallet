@@ -2,7 +2,7 @@ package org.example.model;
 
 import lombok.*;
 
-import java.io.Serializable;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -10,13 +10,15 @@ import java.io.Serializable;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class Device implements Serializable {
-    private int id;
-    private String device;
-    private String country;
+public class Device {
+    private UUID deviceId;
+    private String deviceName;
+    private String code;
 
-    public Device(String device, String country) {
-        this.device = device;
-        this.country = country;
+    // constructor without id
+
+    public Device(String deviceName, String code) {
+        this.deviceName = deviceName;
+        this.code = code;
     }
 }
