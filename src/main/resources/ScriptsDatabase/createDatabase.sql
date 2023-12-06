@@ -1,1 +1,1 @@
-create database wallet;
+create database if not exist wallet;

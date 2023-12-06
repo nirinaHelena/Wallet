@@ -1,4 +1,4 @@
-create table revenue(
+create table if not exist revenue(
     id serial primary key,
     account varchar not null,
     amount double not null,

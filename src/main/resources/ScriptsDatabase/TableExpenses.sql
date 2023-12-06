@@ -1,4 +1,4 @@
-create table expenses(
+create table if not exist expenses(
     id serial primary key,
     account varchar not null,
     amount double not null,
