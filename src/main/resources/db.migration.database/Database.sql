@@ -20,7 +20,7 @@ create table if not exist amount(
     amount double not null,
     datetime timestamp
 )
--- TODO: create table account check amount type column, transaction list
+-- create table account check amount type column, transaction list
 create table if not exist account(
     account_id serial primary key,
     account_name varchar not null check(account_name ilike "courant" or "epargne"),
