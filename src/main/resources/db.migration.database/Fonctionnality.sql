@@ -26,15 +26,12 @@ ORDER BY
 
 
 -- show amount between
-SELECT
-    account_id,
-    COALESCE(SUM(CASE WHEN transaction_type = 'credit' THEN transaction_amount ELSE -transaction_amount END), 0) AS account_balance
-FROM
-    transaction
+SELECT *
+FROM amount
 WHERE
-    transaction_date_hour <= '2023-12-07 12:00:00' -- Remplacez cette date et heure par la date et l'heure souhaitées
-GROUP BY
-    account_id;
+    account_id = <account_id> AND
+    datetime BETWEEN '2023-01-01' AND '2023-12-31';
+
 
 -- show amount today
 SELECT amount

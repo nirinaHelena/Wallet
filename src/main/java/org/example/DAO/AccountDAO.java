@@ -112,5 +112,24 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         return amount;
     }
+
+    // show amount of an account between a date
+    public double balanceHistory(UUID accountId, LocalDateTime startDate, LocalDateTime endDate){
+        double amount = 0 ;
+        String sql = "SELECT *\n" +
+                "FROM amount\n" +
+                "WHERE \n" +
+                "    account_id = "+ accountId +" AND\n" +
+                "    datetime BETWEEN "+ startDate +" AND "+ endDate +";" ;
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)){
+            while (resultSet.next()){
+                amount = resultSet.getDouble("amount");
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return amount;
+    }
     // TODO: about transfer, check it at the subject
 }
