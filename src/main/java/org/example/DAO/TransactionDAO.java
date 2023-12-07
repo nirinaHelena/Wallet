@@ -6,12 +6,14 @@ import org.example.model.Transaction;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
 public class TransactionDAO {
 
     private AmountDAO amountDAO;
+    private AccountDAO accountDAO;
     private Connection connection;
 
     public List<Transaction> findAll() {
