@@ -4,6 +4,7 @@ import org.example.model.Account;
 import org.example.model.Currency;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -82,6 +83,27 @@ public class AccountDAO implements DAOInterface<Account>{
                 "LIMIT 1;" ;
         try (Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(sql)){
+            while (resultSet.next()){
+                amount = resultSet.getDouble("amount");
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return amount;
+    }
+
+    // show amount at a date
+    public double balanceAtADate(UUID accountId, LocalDateTime dateTime){
+        double amount = 0;
+        String sql = "SELECT COALESCE(SUM(amount), 0) AS current_balance\n" +
+                "FROM amount\n" +
+                "WHERE \n" +
+                "    account_id = " + accountId + " AND\n" +
+                "    datetime <= "+ dateTime +"" +
+                "ORDER BY datetime DESC\n" +
+                "LIMIT 1;";
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)){
             while (resultSet.next()){
                 amount = resultSet.getDouble("amount");
             }

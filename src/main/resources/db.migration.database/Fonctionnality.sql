@@ -44,5 +44,14 @@ ORDER BY datetime DESC
 LIMIT 1;
 
 
--- show amount historique
+-- show amount at this date
+-- Sélectionner le montant correspondant au compte et à la date donnée
+SELECT COALESCE(SUM(amount), 0) AS current_balance
+FROM amount
+WHERE
+    account_id = account_id_param AND
+    datetime <= datetime_param
+ORDER BY datetime DESC
+LIMIT 1;
+
 
