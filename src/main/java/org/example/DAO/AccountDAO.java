@@ -72,5 +72,23 @@ public class AccountDAO implements DAOInterface<Account>{
         return accountList;
     }
 
+    // show amount today
+    public double currentBalance(Account account){
+        double amount = 0;
+        String sql = "SELECT amount\n" +
+                "FROM amount\n" +
+                "WHERE account_id = "+ account.getAccountId()+"\n" +
+                "ORDER BY datetime DESC\n" +
+                "LIMIT 1;" ;
+        try (Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(sql)){
+            while (resultSet.next()){
+                amount = resultSet.getDouble("amount");
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return amount;
+    }
     // TODO: about transfer, check it at the subject
 }

@@ -23,3 +23,26 @@ GROUP BY
     t.transaction_label, t.transaction_amount, t.transaction_date_hour, t.transaction_type
 ORDER BY
     a.account_id, t.transaction_date_hour;
+
+
+-- show amount between
+SELECT
+    account_id,
+    COALESCE(SUM(CASE WHEN transaction_type = 'credit' THEN transaction_amount ELSE -transaction_amount END), 0) AS account_balance
+FROM
+    transaction
+WHERE
+    transaction_date_hour <= '2023-12-07 12:00:00' -- Remplacez cette date et heure par la date et l'heure souhaitées
+GROUP BY
+    account_id;
+
+-- show amount today
+SELECT amount
+FROM amount
+WHERE account_id = account_id_param
+ORDER BY datetime DESC
+LIMIT 1;
+
+
+-- show amount historique
+
