@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS account (
     account_currency int REFERENCES currency(currency_id),
     account_type varchar NOT NULL CHECK(account_type ILIKE 'banque' OR account_type ILIKE 'espece' OR account_type ILIKE 'mobile money')
 );
-
+-- TODO: update table transaction as "transaction"
 -- create table transaction
 CREATE TABLE IF NOT EXISTS transaction (
     transaction_id serial PRIMARY KEY,
