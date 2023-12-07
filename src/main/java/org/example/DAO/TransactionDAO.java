@@ -36,18 +36,21 @@ public class TransactionDAO {
         return transactionList;
     }
 
+    // parameter of account: id, accountName, currency, accountType
     public Account save(Transaction toSave, Account account) {
         /**
          * check the type of the transaction
          * check the type of the account
          */
-        Amount amount = new Amount(toSave.getAmount());
+        String sql = "INSERT INTO \"transaction\" (account_id, transaction_label," +
+                "transaction_amount, transaction_type) value" +
+                "(?, ?, ?, ?)";
+
         // for transaction type debit
         if (toSave.getTransactionType() == "debit"){
-            if (account.getAccountType() == "banque"){
-                String sql = "INSERT INTO \"transaction\" (account_id, transaction_label," +
-                        "transaction_amount, transaction_type) value" +
-                        "(?, ?, ?, ?)";
+            // if the account type is bank
+            if (account.getAccountType() == "banque" ){
+
                 try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                     preparedStatement.setObject(1, account.getAccountId());
                     preparedStatement.setString(2, toSave.getTransactionLabel());
@@ -55,32 +58,67 @@ public class TransactionDAO {
                     preparedStatement.setString(4, toSave.getTransactionType());
 
                     int rowAdded = preparedStatement.executeUpdate();
+                    Amount newAmount;
+                    newAmount = new Amount(account.getAmount().getAmount()-toSave.getAmount());
+                    amountDAO.save(newAmount, account.getAccountId());
 
                     if (rowAdded > 0){
                         // TODO: get the last amount of an account
+                        // all attribut of account
                         return account;
                     }
                 }catch (SQLException e){
                     e.printStackTrace();
                 }
             }
+            // else
+            else{
+                if(account.getAmount().getAmount() - toSave.getAmount() > 0){
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+                        preparedStatement.setObject(1, account.getAccountId());
+                        preparedStatement.setString(2, toSave.getTransactionLabel());
+                        preparedStatement.setDouble(3, toSave.getAmount());
+                        preparedStatement.setString(4, toSave.getTransactionType());
+
+                        int rowAdded = preparedStatement.executeUpdate();
+                        Amount newAmount;
+                        newAmount = new Amount(account.getAmount().getAmount()-toSave.getAmount());
+                        amountDAO.save(newAmount, account.getAccountId());
+
+                    }catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                    return account;
+                }else{
+                    return null;
+                }
+            }
         }
+        if (toSave.getTransactionType() == "credit"){
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setObject(1, account.getAccountId());
+                preparedStatement.setString(2, toSave.getTransactionLabel());
+                preparedStatement.setDouble(3, toSave.getAmount());
+                preparedStatement.setString(4, toSave.getTransactionType());
+
+                int rowAdded = preparedStatement.executeUpdate();
+                Amount newAmount;
+                newAmount = new Amount(account.getAmount().getAmount() + toSave.getAmount());
+                amountDAO.save(newAmount, account.getAccountId());
+
+                if (rowAdded > 0){
+                    // TODO: get the last amount of an account
+                    // all attribut of account
+                    return account;
+                }
+        }catch (SQLException e){
+                e.printStackTrace();
+            }
     }
 
 
     public List<Transaction> saveAll(List<Transaction> toSave) {
         return null;
-    }
-    // TODO: join a transaction with an account
-    // TODO: create function to create a transaction, return value: the account
-    // condition: if it's a bank, a can have negatif value
-    // else you can't
-    public Account transaction(Amount amount, Account account){
-        // check what is the type of the account
-        // if it's a bank, you can have negatif value
-        if (account.getAccountType() == "banque"){
-
-        }
     }
 
     // TODO: create a function to transfer money between two account
