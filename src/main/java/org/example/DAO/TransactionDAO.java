@@ -47,11 +47,11 @@ public class TransactionDAO {
                 "(?, ?, ?, ?)";
 
         // for transaction type debit
-        if (toSave.getTransactionType() == "debit"){
+        if (toSave.getTransactionType() == "debit") {
             // if the account type is bank
-            if (account.getAccountType() == "banque" ){
+            if (account.getAccountType() == "banque") {
 
-                try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                     preparedStatement.setObject(1, account.getAccountId());
                     preparedStatement.setString(2, toSave.getTransactionLabel());
                     preparedStatement.setDouble(3, toSave.getAmount());
@@ -59,22 +59,22 @@ public class TransactionDAO {
 
                     int rowAdded = preparedStatement.executeUpdate();
                     Amount newAmount;
-                    newAmount = new Amount(account.getAmount().getAmount()-toSave.getAmount());
+                    newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount());
                     amountDAO.save(newAmount, account.getAccountId());
 
-                    if (rowAdded > 0){
+                    if (rowAdded > 0) {
                         // TODO: get the last amount of an account
                         // all attribut of account
                         return account;
                     }
-                }catch (SQLException e){
+                } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
             // else
-            else{
-                if(account.getAmount().getAmount() - toSave.getAmount() > 0){
-                    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            else {
+                if (account.getAmount().getAmount() - toSave.getAmount() > 0) {
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                         preparedStatement.setObject(1, account.getAccountId());
                         preparedStatement.setString(2, toSave.getTransactionLabel());
                         preparedStatement.setDouble(3, toSave.getAmount());
@@ -82,20 +82,20 @@ public class TransactionDAO {
 
                         int rowAdded = preparedStatement.executeUpdate();
                         Amount newAmount;
-                        newAmount = new Amount(account.getAmount().getAmount()-toSave.getAmount());
+                        newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount());
                         amountDAO.save(newAmount, account.getAccountId());
 
-                    }catch (SQLException e){
+                    } catch (SQLException e) {
                         e.printStackTrace();
                     }
                     return account;
-                }else{
+                } else {
                     return null;
                 }
             }
         }
-        if (toSave.getTransactionType() == "credit"){
-            try(PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        if (toSave.getTransactionType() == "credit") {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setObject(1, account.getAccountId());
                 preparedStatement.setString(2, toSave.getTransactionLabel());
                 preparedStatement.setDouble(3, toSave.getAmount());
@@ -106,21 +106,18 @@ public class TransactionDAO {
                 newAmount = new Amount(account.getAmount().getAmount() + toSave.getAmount());
                 amountDAO.save(newAmount, account.getAccountId());
 
-                if (rowAdded > 0){
+                if (rowAdded > 0) {
                     // TODO: get the last amount of an account
                     // all attribut of account
                     return account;
                 }
-        }catch (SQLException e){
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
-    }
-
-
-    public List<Transaction> saveAll(List<Transaction> toSave) {
+        }
         return null;
+
+
+        // TODO: create a function to transfer money between two account
     }
-
-    // TODO: create a function to transfer money between two account
-
 }
