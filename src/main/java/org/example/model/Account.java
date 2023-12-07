@@ -21,13 +21,18 @@ public class Account {
     private Currency currency;
     private String accountType;
 
-    // amount value initial: 0.0
-    Amount amountInitial= new Amount(0.0);
     // constructor without accountId and amount initial= 0.0
 
     public Account(String accountName, Currency currency, String accountType) {
         this.accountName = accountName;
-        this.amount = amountInitial;
+        this.currency = currency;
+        this.accountType = accountType;
+    }
+
+    // constructor without amount and transaction list
+    public Account(UUID accountId, String accountName, Currency currency, String accountType) {
+        this.accountId = accountId;
+        this.accountName = accountName;
         this.currency = currency;
         this.accountType = accountType;
     }
