@@ -2,42 +2,38 @@ package org.example.model;
 
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-@AllArgsConstructor
 public class Transaction {
-    private Account account;
-    private Double amount;
-    private Device device;
-    private String label;
-    private LocalDate date;
-    private LocalDateTime hour;
-    private String note;
-    private PaiementMethod paiementMethod;
-    private PaiementStatus paiementStatus;
-    private String location;
+    private UUID transactionId;
+    private UUID account_id;
+    private String transactionLabel;
+    private double amount;
+    private LocalDateTime dateTime;
+    private String transactionType;
+    // type: debit or credit
 
-
-    //constructor without date and hour as parameter
-    public Transaction(Account account, Double amount, Device device,
-                       String label, String note,
-                       PaiementMethod paiementMethod,
-                       PaiementStatus paiementStatus, String location) {
-        this.account = account;
+    // constructor without id
+    public Transaction(UUID account_id, String transactionLabel, double amount,
+                       LocalDateTime dateTime, String transactionType) {
+        this.account_id= account_id;
+        this.transactionLabel = transactionLabel;
         this.amount = amount;
-        this.device = device;
-        this.label = label;
-        this.date = LocalDate.now();
-        this.hour = LocalDateTime.now();
-        this.note = note;
-        this.paiementMethod = paiementMethod;
-        this.paiementStatus = paiementStatus;
-        this.location = location;
+        this.dateTime = dateTime;
+        this.transactionType = transactionType;
+    }
+
+    // constructor whithout id, account_id, datetime
+    public Transaction( String transactionLabel, double amount, String transactionType) {
+        this.transactionLabel = transactionLabel;
+        this.amount = amount;
+        this.transactionType = transactionType;
     }
 }

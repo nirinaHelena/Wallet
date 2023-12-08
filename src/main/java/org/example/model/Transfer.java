@@ -2,24 +2,28 @@ package org.example.model;
 
 import lombok.*;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-public class Transfer extends Transaction{
-    private Account toAccount;
-    private Account beneficiary;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-    //constructor without parameter date and hour
-    public Transfer(Account account, Double amount, Device device,
-                    String label, String note,
-                    PaiementMethod paiementMethod,
-                    PaiementStatus paiementStatus, String location,
-                    Account toAccount, Account beneficiary) {
-        super(account, amount, device, label, note, paiementMethod, paiementStatus, location);
-        this.toAccount = toAccount;
-        this.beneficiary = beneficiary;
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@ToString
+public class Transfer {
+    private UUID transferId;
+    private UUID senderAccountId;
+    private UUID receiverAccountId;
+    private Amount transferAmount;
+    private LocalDateTime dateTime;
+
+    // constructor without transfer id
+
+    public Transfer(UUID senderAccountId, UUID receiverAccountId,
+                    Amount transferAmount, LocalDateTime dateTime) {
+        this.senderAccountId = senderAccountId;
+        this.receiverAccountId = receiverAccountId;
+        this.transferAmount = transferAmount;
+        this.dateTime = dateTime;
     }
 }

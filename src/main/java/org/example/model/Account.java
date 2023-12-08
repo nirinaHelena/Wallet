@@ -2,25 +2,37 @@ package org.example.model;
 
 import lombok.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
+import java.util.List;
+import java.util.UUID;
+
+
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 @ToString
 public class Account {
-    private int id;
-    private String name;
-    private String email;
-    private Double balance;
+    private UUID accountId;
+    private String accountName;
+    private Amount amount;
+    private List<Transaction> transactionList;
+    private Currency currency;
+    private String accountType;
 
-    public Account(String name, String email) {
-        this.name = name;
-        this.email = email;
+    // constructor without accountId and amount initial= 0.0
+
+    public Account(String accountName, Currency currency, String accountType) {
+        this.accountName = accountName;
+        this.currency = currency;
+        this.accountType = accountType;
     }
 
-    public Account(int id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
+    // constructor without amount and transaction list
+    public Account(UUID accountId, String accountName, Currency currency, String accountType) {
+        this.accountId = accountId;
+        this.accountName = accountName;
+        this.currency = currency;
+        this.accountType = accountType;
     }
 }
