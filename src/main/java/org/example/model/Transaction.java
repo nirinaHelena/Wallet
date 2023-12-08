@@ -32,11 +32,8 @@ public class Transaction {
 
     // constructor whithout id, account_id, datetime
     public Transaction( String transactionLabel, double amount, String transactionType) {
-        this.transactionId = transactionId;
-        this.account_id = account_id;
         this.transactionLabel = transactionLabel;
         this.amount = amount;
-        this.dateTime = dateTime;
         this.transactionType = transactionType;
     }
 }
