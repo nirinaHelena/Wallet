@@ -24,7 +24,7 @@ public class TransferDAO {
 
                     preparedStatement.setObject(1,senderAccount.getAccountId());
                     preparedStatement.setObject(2, receiverAccount.getAccountId());
-                    preparedStatement.setDouble(3. amount);
+                    preparedStatement.setDouble(3, amount);
 
                     int rowAdded = preparedStatement.executeUpdate();
 
@@ -44,7 +44,8 @@ public class TransferDAO {
 
             }
         }else{
-            return "Sorry, you don't have enough money for the transaction."
+            return "Sorry, you don't have enough money for the transaction." ;
         }
+        return null;
     }
 }
