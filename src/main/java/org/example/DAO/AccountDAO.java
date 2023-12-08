@@ -131,5 +131,4 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         return amount;
     }
-    // TODO: about transfer, check it at the subject
 }
