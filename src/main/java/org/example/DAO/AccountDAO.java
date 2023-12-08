@@ -1,7 +1,9 @@
 package org.example.DAO;
 
 import org.example.model.Account;
+import org.example.model.Amount;
 import org.example.model.Currency;
+import org.example.model.Transaction;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -11,6 +13,8 @@ import java.util.UUID;
 
 public class AccountDAO implements DAOInterface<Account>{
     private Connection connection;
+    private AmountDAO amountDAO;
+    private TransactionDAO transactionDAO;
 
     // find all account without their amount and transaction
     @Override
@@ -92,10 +96,32 @@ public class AccountDAO implements DAOInterface<Account>{
         return amount;
     }
 
+    // show an account with all parameter
+    public List<Account> findAccount(UUID accountId){
+        String sql = "SELECT * FROM account where account_id = "+ accountId + ";" ;
+        List<Account> accountList = new ArrayList<>();
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()){
+                accountList.add(new Account(
+                        (UUID) resultSet.getObject("account_id"),
+                        resultSet.getString("account_name"),
+                        amountDAO.findLastAmount(accountId),
+                        transactionDAO.findAll(accountId),
+                        (Currency) resultSet.getObject("account_currency"),
+                        resultSet.getString("account_type")
+                ));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return accountList;
+    }
+
     // show amount at a date
     public double balanceAtADate(UUID accountId, LocalDateTime dateTime){
         double amount = 0;
-        String sql = "SELECT COALESCE(SUM(amount), 0) AS current_balance\n" +
+        String sql = "SELECT amount \n" +
                 "FROM amount\n" +
                 "WHERE \n" +
                 "    account_id = " + accountId + " AND\n" +
@@ -116,7 +142,7 @@ public class AccountDAO implements DAOInterface<Account>{
     // show amount of an account between a date
     public double balanceHistory(UUID accountId, LocalDateTime startDate, LocalDateTime endDate){
         double amount = 0 ;
-        String sql = "SELECT *\n" +
+        String sql = "SELECT * \n" +
                 "FROM amount\n" +
                 "WHERE \n" +
                 "    account_id = "+ accountId +" AND\n" +
