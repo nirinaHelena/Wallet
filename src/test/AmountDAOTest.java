@@ -67,7 +67,4 @@ class AmountDAOTest {
         // Vérifier si la liste n'est pas nulle
         assertNotNull(amountList);
     }
-
-    // Ajouter d'autres tests selon les méthodes de votre DAO
-
 }
