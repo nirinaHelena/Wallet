@@ -42,40 +42,63 @@ public class AccountDAO implements DAOInterface<Account>{
 
     // save an account with only name currency and type
     @Override
-    public Account save(Account toSave) {
+    // TODO: change currency to int when insert into database
+public Amount save(Amount toSave, UUID accountId, int currencyId) {
+    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
 
-        String sql = "INSERT INTO account(account_name, account_currency, account_type) values (?, ?);";
+    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        preparedStatement.setObject(1, accountId);
+        preparedStatement.setDouble(2, toSave.getAmount());
+        preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+        preparedStatement.setInt(4, currencyId); // Change currency to int
 
-        // TODO: change currency to int when insert into database
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-            preparedStatement.setString(1, toSave.getAccountName());
-            preparedStatement.setObject(2, toSave.getCurrency());
-            preparedStatement.setString(3, toSave.getAccountType());
-
-            int rowAdded = preparedStatement.executeUpdate();
-            if (rowAdded > 0){
-                return toSave;
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
+        int rowAdded = preparedStatement.executeUpdate();
+        if (rowAdded > 0) {
+            return toSave;
         }
-        return null;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return null;
+}
+
 
     // save a list account with name, currency, type
     @Override
     public List<Account> saveAll(List<Account> toSave) {
-
-        List<Account> accountList = new ArrayList<>();
-
-        for (Account account: toSave){
-            Account saveAccount = save(account);
-            if (saveAccount != null){
-                accountList.add(saveAccount);
+        String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            for (Account account : toSave) {
+                preparedStatement.setString(1, account.getAccountName());
+                preparedStatement.setObject(2, account.getCurrency());
+                preparedStatement.setString(3, account.getAccountType());
+    
+                preparedStatement.addBatch();
             }
+    
+            int[] rowsAdded = preparedStatement.executeBatch();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+    
+            List<Account> savedAccounts = new ArrayList<>();
+            for (int i = 0; i < rowsAdded.length; i++) {
+                if (rowsAdded[i] > 0 && generatedKeys.next()) {
+                    Account savedAccount = new Account(
+                            UUID.fromString(generatedKeys.getString(1)),
+                            toSave.get(i).getAccountName(),
+                            toSave.get(i).getCurrency(),
+                            toSave.get(i).getAccountType()
+                    );
+                    savedAccounts.add(savedAccount);
+                }
+            }
+            return savedAccounts;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return accountList;
     }
+    
 
     // show amount today
     public double currentBalance(UUID accountId){

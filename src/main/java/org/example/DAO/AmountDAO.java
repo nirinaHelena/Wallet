@@ -14,6 +14,45 @@ public class AmountDAO {
     private Connection connection;
 
     // find all amount
+    public List<Amount> findAll() {
+        List<Amount> amountList = new ArrayList<>();
+
+        String sql= "SELECT FROM * amount";
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()){
+                amountList.add(new Amount(
+                        resultSet.getDouble("amount"),
+                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                ));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return amountList;
+    }
+
+public Amount save(Amount toSave, UUID accountId, int currencyId) {
+    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
+
+    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        preparedStatement.setObject(1, accountId);
+        preparedStatement.setDouble(2, toSave.getAmount());
+        preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+        preparedStatement.setInt(4, currencyId); // Change currency to int
+
+        int rowAdded = preparedStatement.executeUpdate();
+        if (rowAdded > 0) {
+            return toSave;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+
     public List<Amount> saveAll(List<Amount> toSave, UUID accountId) {
         String sql = "INSERT INTO amount (account_id, amount, datetime) VALUES (?, ?, ?);";
     
@@ -78,5 +117,4 @@ public class AmountDAO {
     public Amount findCurrentAmount(UUID accountId) {
         return findLastAmount(accountId);
     }
-    
-}
+}    
