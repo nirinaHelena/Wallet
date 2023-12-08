@@ -13,51 +13,69 @@ public class AmountDAO {
     private Connection connection;
 
     // find all amount
-    public List<Amount> findAll() {
-        List<Amount> amountList = new ArrayList<>();
-
-        String sql= "SELECT FROM * amount";
-
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-            while (resultSet.next()){
-                amountList.add(new Amount(
+    public List<Amount> saveAll(List<Amount> toSave, UUID accountId) {
+        String sql = "INSERT INTO amount (account_id, amount, datetime) VALUES (?, ?, ?);";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            for (Amount amount : toSave) {
+                preparedStatement.setObject(1, accountId);
+                preparedStatement.setDouble(2, amount.getAmount());
+                preparedStatement.setTimestamp(3, Timestamp.valueOf(amount.getDateTime()));
+    
+                preparedStatement.addBatch();
+            }
+    
+            int[] rowsAdded = preparedStatement.executeBatch();
+            return (rowsAdded.length == toSave.size()) ? toSave : null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public Amount findLastAmount(UUID accountId) {
+        Amount lastAmount = null;
+        String sql = "SELECT * FROM amount WHERE account_id = ? ORDER BY datetime DESC LIMIT 1;";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+    
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                lastAmount = new Amount(
                         resultSet.getDouble("amount"),
                         resultSet.getTimestamp("datetime").toLocalDateTime()
-                ));
+                );
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return amountList;
+        return lastAmount;
     }
-
-    // amount link to an account
-    public Amount save(Amount toSave, UUID accountId) {
-
-        String sql= "INSERT INTO amount (account_id, amount) value(?, ?);";
-
-        try (PreparedStatement preparedStatement= connection.prepareStatement(sql)){
+    
+    public Amount findAmountAtDate(UUID accountId, LocalDateTime dateTime) {
+        Amount amount = null;
+        String sql = "SELECT * FROM amount WHERE account_id = ? AND datetime <= ? ORDER BY datetime DESC LIMIT 1;";
+    
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setObject(1, accountId);
-            preparedStatement.setDouble(2, toSave.getAmount());
-
-            int rowAdded = preparedStatement.executeUpdate();
-            if (rowAdded > 0){
-                return toSave;
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(dateTime));
+    
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                amount = new Amount(
+                        resultSet.getDouble("amount"),
+                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                );
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return amount;
     }
-
-    // TODO: find how to create a couple <amount, account>
-    public List<Amount> saveAll(List<Amount> toSave) {
-        return  null;
+    
+    public Amount findCurrentAmount(UUID accountId) {
+        return findLastAmount(accountId);
     }
-    // TODO: create function to get the last amount
-    // TODO: create function to get the account's amount at a given date
-    // TODO: create function to get the account's amount now
-
-    // TODO: work with the last amount
+    
 }
