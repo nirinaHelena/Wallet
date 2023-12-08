@@ -38,6 +38,29 @@ public class TransactionDAO {
         return transactionList;
     }
 
+    // find all transaction of an account
+    public List<Transaction> findAll(UUID accountId) {
+        List<Transaction> transactionList = new ArrayList<>();
+        String sql = "SELECT * FROM \"transaction\" where account_id = "+ accountId + "; " ;
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()){
+                transactionList.add(new Transaction(
+                        (UUID) resultSet.getObject("transaction_id"),
+                        (UUID) resultSet.getObject("account_id"),
+                        resultSet.getString("transaction_label"),
+                        resultSet.getDouble("transaction_amount"),
+                        resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
+                        resultSet.getString("transaction_type")
+                ));
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return transactionList;
+    }
+
     // parameter of account: id, accountName, currency, accountType
     public Account save(Transaction toSave, Account account) {
         /**
@@ -62,7 +85,9 @@ public class TransactionDAO {
                     int rowAdded = preparedStatement.executeUpdate();
                     Amount newAmount;
                     newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount());
-                    amountDAO.save(newAmount, account.getAccountId());
+                    List<Amount> amountList = new ArrayList<>();
+                    amountList.add(newAmount);
+                    amountDAO.saveAll(amountList, account.getAccountId());
 
                     if (rowAdded > 0) {
                         // TODO: get the last amount of an account
