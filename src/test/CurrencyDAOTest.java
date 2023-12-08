@@ -20,7 +20,7 @@ public class CurrencyDAOTest {
 
     @BeforeEach
     void setUp() {
-        // Initialisez la connexion à la base de données (vous devrez peut-être ajuster l'URL, le nom d'utilisateur et le mot de passe)
+        // Initialisez la connexion à la base de données
         String jdbcUrl = "jdbc:mysql://localhost:3306/votre_base_de_donnees";
         String username = "votre_nom_utilisateur";
         String password = "votre_mot_de_passe";
@@ -48,10 +48,10 @@ public class CurrencyDAOTest {
 
     @Test
     void testFindAll() {
-        // Assurez-vous d'avoir des données dans la table currency pour ce test
+        
         List<Currency> currencies = currencyDAO.findAll();
         assertNotNull(currencies);
-        // Ajoutez des assertions supplémentaires en fonction de vos données
+       
     }
 
     @Test
@@ -62,11 +62,9 @@ public class CurrencyDAOTest {
         // Enregistrez la devise
         Currency savedCurrency = currencyDAO.save(currencyToSave);
 
-        // Assurez-vous que la devise enregistrée n'est pas nulle et a un ID généré
         assertNotNull(savedCurrency);
         assertNotNull(savedCurrency.getCurrencyId());
 
-        // Ajoutez des assertions supplémentaires en fonction de vos besoins
     }
 
     @Test
