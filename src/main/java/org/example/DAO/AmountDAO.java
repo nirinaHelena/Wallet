@@ -122,4 +122,24 @@ public Amount save(Amount toSave, UUID accountId) {
     public Amount findCurrentAmount(UUID accountId) {
         return findLastAmount(accountId);
     }
+
+    public double weightedAverageExchange(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT AVG(exchange_rate) AS weighted_average " +
+                "FROM amount " +
+                "WHERE account_id = ? AND DATE(datetime) = ?;";
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, date);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("weighted_average");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Valeur par défaut si quelque chose ne fonctionne pas
+    }
 }    
