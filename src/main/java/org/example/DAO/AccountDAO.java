@@ -1,7 +1,7 @@
 package org.example.DAO;
 
+import org.example.databaseConfiguration.DatabaseConnection;
 import org.example.model.Account;
-import org.example.model.Amount;
 import org.example.model.Currency;
 
 import java.sql.*;
@@ -10,20 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AccountDAO implements DAOInterface<Account>{
-    private Connection connection;
+public class AccountDAO{
+    private final DatabaseConnection connection;
     private AmountDAO amountDAO;
     private TransactionDAO transactionDAO;
 
+    public AccountDAO() {
+        this.connection = new DatabaseConnection(); // Initialize the connection object
+    }
     // find all account without their amount and transaction
-    @Override
     public List<Account> findAll() {
 
         List<Account> accountList = new ArrayList<>();
 
-        String sql= "SELECT FROM * account";
+        String sql= "SELECT * FROM account ;";
 
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = connection.getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
                 accountList.add(new Account(
@@ -38,36 +40,11 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         return accountList;
     }
-
-    // save an account with only name currency and type
-    @Override
-    // TODO: change currency to int when insert into database
-public Amount save(Amount toSave, UUID accountId, int currencyId) {
-    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
-
-    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-        preparedStatement.setObject(1, accountId);
-        preparedStatement.setDouble(2, toSave.getAmount());
-        preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
-        preparedStatement.setInt(4, currencyId); // Change currency to int
-
-        int rowAdded = preparedStatement.executeUpdate();
-        if (rowAdded > 0) {
-            return toSave;
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return null;
-}
-
-
     // save a list account with name, currency, type
-    @Override
     public List<Account> saveAll(List<Account> toSave) {
         String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
     
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             for (Account account : toSave) {
                 preparedStatement.setString(1, account.getAccountName());
                 preparedStatement.setObject(2, account.getCurrency());
@@ -107,7 +84,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
                 "WHERE account_id = "+ accountId+"\n" +
                 "ORDER BY datetime DESC\n" +
                 "LIMIT 1;" ;
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = connection.getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery(sql)){
             while (resultSet.next()){
                 amount = resultSet.getDouble("amount");
@@ -122,7 +99,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
     public List<Account> findAccount(UUID accountId){
         String sql = "SELECT * FROM account where account_id = "+ accountId + ";" ;
         List<Account> accountList = new ArrayList<>();
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
                 accountList.add(new Account)(
@@ -151,7 +128,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
                 "    datetime <= "+ dateTime +"" +
                 "ORDER BY datetime DESC\n" +
                 "LIMIT 1;";
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)){
             while (resultSet.next()){
                 amount = resultSet.getDouble("amount");
@@ -170,7 +147,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
                 "WHERE \n" +
                 "    account_id = "+ accountId +" AND\n" +
                 "    datetime BETWEEN "+ startDate +" AND "+ endDate +";" ;
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)){
             while (resultSet.next()){
                 amount = resultSet.getDouble("amount");
