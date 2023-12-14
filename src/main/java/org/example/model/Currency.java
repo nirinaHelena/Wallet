@@ -17,7 +17,7 @@ public class Currency {
     private String currencyCode;
 
     // constructor without id
-    public Currency(String currencyName, String currencyCode) {
+    public Currency(UUID currencyId, String currencyName, String currencyCode) {
         this.currencyName = currencyName;
         this.currencyCode = currencyCode;
     }

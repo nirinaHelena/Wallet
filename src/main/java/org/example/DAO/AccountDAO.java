@@ -3,7 +3,6 @@ package org.example.DAO;
 import org.example.model.Account;
 import org.example.model.Amount;
 import org.example.model.Currency;
-import org.example.model.Transaction;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -126,14 +125,15 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
-                accountList.add(new Account(
+                accountList.add(new Account)(
                         (UUID) resultSet.getObject("account_id"),
                         resultSet.getString("account_name"),
                         amountDAO.findLastAmount(accountId),
                         transactionDAO.findAll(accountId),
                         (Currency) resultSet.getObject("account_currency"),
                         resultSet.getString("account_type")
-                ));
+                )
+                );
             }
         }catch (SQLException e){
             e.printStackTrace();
@@ -179,5 +179,11 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
             e.printStackTrace();
         }
         return amount;
+    }
+
+    @Override
+    public Account save(Account toSave) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 }
