@@ -10,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AccountDAO {
+public class AccountDAO implements DAOInterface<Account>{
     private final DatabaseConnection connection;
-    private final AmountDAO amountDAO;  // Assurez-vous d'initialiser amountDAO dans le constructeur
-    private final TransactionDAO transactionDAO;  // Assurez-vous d'initialiser transactionDAO dans le constructeur
+    private final AmountDAO amountDAO;
+    private final TransactionDAO transactionDAO;
 
     public AccountDAO() {
-        this.connection = new DatabaseConnection(); // Initialise l'objet de connexion
-        this.amountDAO = new AmountDAO();  // Initialisez amountDAO ici ou dans le constructeur
-        this.transactionDAO = new TransactionDAO();  // Initialisez transactionDAO ici ou dans le constructeur
+        this.connection = new DatabaseConnection();
+        this.amountDAO = new AmountDAO();
+        this.transactionDAO = new TransactionDAO();
     }
 
     // Trouve tous les comptes sans leurs montants et transactions associées
@@ -77,6 +77,42 @@ public class AccountDAO {
             return null;
         }
     }
+
+    @Override
+    public Account save(Account toSave) {
+        String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, toSave.getAccountName());
+            preparedStatement.setObject(2, toSave.getCurrency());
+            preparedStatement.setString(3, toSave.getAccountType());
+
+            int rowsAdded = preparedStatement.executeUpdate();
+
+            if (rowsAdded > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        UUID generatedAccountId = UUID.fromString(generatedKeys.getString(1));
+
+                        // Crée un nouvel objet Account avec l'ID généré
+                        Account savedAccount = new Account(
+                                generatedAccountId,
+                                toSave.getAccountName(),
+                                toSave.getCurrency(),
+                                toSave.getAccountType()
+                        );
+
+                        return savedAccount;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;  // Retourne null en cas d'échec de l'enregistrement
+    }
+
 
     // Affiche le solde actuel
     public double currentBalance(UUID accountId) {
