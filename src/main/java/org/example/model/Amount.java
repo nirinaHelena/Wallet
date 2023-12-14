@@ -13,4 +13,5 @@ import java.time.LocalDateTime;
 public class Amount {
     private double amount;
     private LocalDateTime dateTime;
+    private double exchangeRate;
 }
