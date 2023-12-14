@@ -140,6 +140,37 @@ public Amount save(Amount toSave, UUID accountId) {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0; // Valeur par défaut si quelque chose ne fonctionne pas
+        return 0.0; // Valeur par défaut si quelque chose ne fonctionne pas
+    }
+
+    public double getMinimumExchangeRate(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT MIN(exchange_rate) FROM amount WHERE account_id = ? AND datetime::DATE = ?;";
+        return getExchangeRate(accountId, date, sql);
+    }
+
+    public double getMaximumExchangeRate(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT MAX(exchange_rate) FROM amount WHERE account_id = ? AND datetime::DATE = ?;";
+        return getExchangeRate(accountId, date, sql);
+    }
+
+    public double getMedianExchangeRate(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY exchange_rate) " +
+                "FROM amount WHERE account_id = ? AND datetime::DATE = ?;";
+        return getExchangeRate(accountId, date, sql);
+    }
+    private double getExchangeRate(UUID accountId, LocalDateTime date, String sql) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, Timestamp.valueOf(date));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0; // Remplacez cette valeur par une valeur par défaut ou une gestion d'erreur appropriée
     }
 }    
