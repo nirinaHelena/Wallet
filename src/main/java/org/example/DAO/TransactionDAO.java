@@ -5,6 +5,7 @@ import org.example.model.Amount;
 import org.example.model.Transaction;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -90,5 +91,31 @@ public class TransactionDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<Transaction> findAll(UUID accountId, LocalDateTime date) {
+        List<Transaction> transactionList = new ArrayList<>();
+        String sql = "SELECT * FROM transaction WHERE account_id = ? AND DATE(transaction_date_hour) = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, date.toLocalDate());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    transactionList.add(new Transaction(
+                            (UUID) resultSet.getObject("transaction_id"),
+                            (UUID) resultSet.getObject("account_id"),
+                            resultSet.getString("transaction_label"),
+                            resultSet.getDouble("transaction_amount"),
+                            resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
+                            resultSet.getString("transaction_type")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactionList;
     }
 }
