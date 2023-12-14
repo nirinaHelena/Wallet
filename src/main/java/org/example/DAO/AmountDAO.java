@@ -38,7 +38,6 @@ public class AmountDAO {
 
 public Amount save(Amount toSave, UUID accountId) {
     String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
-
     try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
         preparedStatement.setObject(1, accountId);
         preparedStatement.setDouble(2, toSave.getAmount());

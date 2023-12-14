@@ -199,6 +199,4 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         return amount;
     }
-
-    // La méthode save de l'interface DAOInterface n'est pas implémentée ici, vous pouvez ajouter votre propre logique si nécessaire.
 }
