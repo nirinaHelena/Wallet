@@ -13,9 +13,4 @@ import java.time.LocalDateTime;
 public class Amount {
     private double amount;
     private LocalDateTime dateTime;
-
-    public Amount(double amount, LocalDateTime datetime) {
-        this.amount = amount;
-        this.dateTime = LocalDateTime.now();
-    }
 }
