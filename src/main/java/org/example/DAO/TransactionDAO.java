@@ -63,8 +63,8 @@ public class TransactionDAO {
         return transactionList;
     }
 
-    public Account save(Transaction toSave, Account account) {
-        String sql = "INSERT INTO \"transaction\" (account_id, transaction_label, transaction_amount, transaction_type) " +
+    public Account save(Transaction toSave, Account account, double exchangeRate) {
+        String sql = "INSERT INTO \"transaction\" (account_id, transaction_label, transaction_amount, transaction_type, exchange_rate) " +
                 "VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -72,6 +72,9 @@ public class TransactionDAO {
             preparedStatement.setString(2, toSave.getTransactionLabel());
             preparedStatement.setDouble(3, toSave.getAmount());
             preparedStatement.setString(4, toSave.getTransactionType());
+            preparedStatement.setDouble(5, toSave.getAmount() * exchangeRate);
+
+
 
             int rowsAdded = preparedStatement.executeUpdate();
 

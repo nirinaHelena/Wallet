@@ -38,8 +38,8 @@ public class Main {
         Transaction transaction2 = new Transaction(account2.getAccountId(), "Vente", 50.0, LocalDateTime.now(), "credit");
 
         // Enregistrement des transactions dans la base de données
-        transactionDAO.save(transaction1, account1);
-        transactionDAO.save(transaction2, account2);
+        transactionDAO.save(transaction1, account1, 10);
+        transactionDAO.save(transaction2, account2, 8.5);
 
         // Affichage de tous les comptes
         List<Account> allAccounts = accountDAO.findAll();
