@@ -6,7 +6,6 @@ import org.example.model.Transaction;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ public class TransactionDAO {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
-                transactionList.add(new Transaction(
+                transactionList.add(new Transaction)(
                         (UUID) resultSet.getObject("transaction_id"),
                         (UUID) resultSet.getObject("account_id"),
                         resultSet.getString("transaction_label"),
@@ -46,14 +45,14 @@ public class TransactionDAO {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
-                transactionList.add(new Transaction(
+                transactionList.add(new Transaction){
                         (UUID) resultSet.getObject("transaction_id"),
                         (UUID) resultSet.getObject("account_id"),
                         resultSet.getString("transaction_label"),
                         resultSet.getDouble("transaction_amount"),
                         resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
                         resultSet.getString("transaction_type")
-                ));
+                )};
             }
         }catch (SQLException e){
             e.printStackTrace();
@@ -84,7 +83,7 @@ public class TransactionDAO {
 
                     int rowAdded = preparedStatement.executeUpdate();
                     Amount newAmount;
-                    newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount());
+                    newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount(), resultSet.getTimestamp("datetime").toLocalDateTime());
                     List<Amount> amountList = new ArrayList<>();
                     amountList.add(newAmount);
                     amountDAO.saveAll(amountList, account.getAccountId());
@@ -109,7 +108,7 @@ public class TransactionDAO {
 
                         int rowAdded = preparedStatement.executeUpdate();
                         Amount newAmount;
-                        newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount());
+                        newAmount = new Amount(account.getAmount().getAmount() - toSave.getAmount(), resultSet.getTimestamp("datetime").toLocalDateTime());
                         amountDAO.save(newAmount, account.getAccountId());
 
                     } catch (SQLException e) {
@@ -130,7 +129,7 @@ public class TransactionDAO {
 
                 int rowAdded = preparedStatement.executeUpdate();
                 Amount newAmount;
-                newAmount = new Amount(account.getAmount().getAmount() + toSave.getAmount());
+                newAmount = new Amount(account.getAmount().getAmount() + toSave.getAmount(), resultSet.getTimestamp("datetime").toLocalDateTime());
                 amountDAO.save(newAmount, account.getAccountId());
 
                 if (rowAdded > 0) {
