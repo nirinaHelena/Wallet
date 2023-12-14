@@ -72,7 +72,7 @@ public class CurrencyDAOTest {
         // Créez une liste de devises pour le test
         List<Currency> currenciesToSave = List.of(
                 new Currency("Euro", "EUR"),
-                new Currency("Yen", "JPY")
+                new Currency("Ariary", "MGA")
         );
 
         // Enregistrez la liste de devises
