@@ -1,9 +1,3 @@
--- create database wallet
-CREATE DATABASE wallet;
-
--- connect to the database wallet
-\c wallet;
-
 -- create table currency
 CREATE TABLE IF NOT EXISTS currency (
     currency_id serial PRIMARY KEY,
@@ -34,13 +28,4 @@ CREATE TABLE IF NOT EXISTS amount (
     account_id int REFERENCES account(account_id),
     amount double precision NOT NULL,
     datetime timestamp
-);
-
--- create table transfer_history
-CREATE TABLE IF NOT EXISTS transfer_history (
-    transfer_id serial PRIMARY KEY,
-    sender_account_id int REFERENCES account(account_id),
-    receiver_account_id int REFERENCES account(account_id),
-    transfer_amount double precision NOT NULL,
-    transfer_date_hour timestamp DEFAULT,
 );
