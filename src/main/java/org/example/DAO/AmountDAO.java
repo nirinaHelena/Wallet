@@ -1,8 +1,7 @@
 package org.example.DAO;
 
-import org.example.model.Account;
+import org.example.databaseConfiguration.DatabaseConnection;
 import org.example.model.Amount;
-import org.example.model.Currency;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -11,7 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class AmountDAO {
-    private Connection connection;
+    private DatabaseConnection connection;
+
+    public AmountDAO() {
+        this.connection = new DatabaseConnection();
+    }
 
     // find all amount
     public List<Amount> findAll() {
@@ -19,7 +22,7 @@ public class AmountDAO {
 
         String sql= "SELECT FROM * amount";
 
-        try (Statement statement = connection.createStatement();
+        try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
                 amountList.add(new Amount(
@@ -33,15 +36,13 @@ public class AmountDAO {
         return amountList;
     }
 
-public Amount save(Amount toSave, UUID accountId, int currencyId) {
+public Amount save(Amount toSave, UUID accountId) {
     String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
 
-    try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+    try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
         preparedStatement.setObject(1, accountId);
         preparedStatement.setDouble(2, toSave.getAmount());
         preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
-        preparedStatement.setInt(4, currencyId); // Change currency to int
-
         int rowAdded = preparedStatement.executeUpdate();
         if (rowAdded > 0) {
             return toSave;
@@ -56,7 +57,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
     public List<Amount> saveAll(List<Amount> toSave, UUID accountId) {
         String sql = "INSERT INTO amount (account_id, amount, datetime) VALUES (?, ?, ?);";
     
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             for (Amount amount : toSave) {
                 preparedStatement.setObject(1, accountId);
                 preparedStatement.setDouble(2, amount.getAmount());
@@ -77,7 +78,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
         Amount lastAmount = null;
         String sql = "SELECT * FROM amount WHERE account_id = ? ORDER BY datetime DESC LIMIT 1;";
     
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             preparedStatement.setObject(1, accountId);
     
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -97,7 +98,7 @@ public Amount save(Amount toSave, UUID accountId, int currencyId) {
         Amount amount = null;
         String sql = "SELECT * FROM amount WHERE account_id = ? AND datetime <= ? ORDER BY datetime DESC LIMIT 1;";
     
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             preparedStatement.setObject(1, accountId);
             preparedStatement.setTimestamp(2, Timestamp.valueOf(dateTime));
     
