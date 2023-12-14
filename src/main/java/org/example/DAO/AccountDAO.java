@@ -3,6 +3,7 @@ package org.example.DAO;
 import org.example.databaseConfiguration.DatabaseConnection;
 import org.example.model.Account;
 import org.example.model.Currency;
+import org.example.model.Transaction;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -199,4 +200,28 @@ public class AccountDAO implements DAOInterface<Account>{
         }
         return amount;
     }
+
+    public double currentBalance(UUID accountId, LocalDateTime date) {
+        double weightedAverageExchangeRate = amountDAO.weightedAverageExchange(accountId, date);
+
+        // Récupérez les transactions à la date donnée
+        List<Transaction> transactions = transactionDAO.findAll(accountId, date);
+
+        // Calculez le solde ajusté en fonction de la moyenne pondérée du taux de change
+        double amount = 0.0;
+        for (Transaction transaction : transactions) {
+            // Utilisez weightedAverageExchangeRate pour ajuster le montant de la transaction
+            double adjustedAmount = transaction.getAmount() * weightedAverageExchangeRate;
+
+            // Ajoutez ou soustrayez le montant ajusté en fonction du type de transaction
+            if ("credit".equals(transaction.getTransactionType())) {
+                amount += adjustedAmount;
+            } else if ("debit".equals(transaction.getTransactionType())) {
+                amount -= adjustedAmount;
+            }
+        }
+
+        return amount; // Solde ajusté en fonction de la moyenne pondérée du taux de change
+    }
+
 }
