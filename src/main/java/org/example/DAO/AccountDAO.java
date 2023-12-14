@@ -47,7 +47,7 @@ public class AccountDAO{
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             for (Account account : toSave) {
                 preparedStatement.setString(1, account.getAccountName());
-                preparedStatement.setObject(2, account.getCurrency());
+                preparedStatement.setObject(2, account.getCurrency().getCurrencyId());
                 preparedStatement.setString(3, account.getAccountType());
     
                 preparedStatement.addBatch();
