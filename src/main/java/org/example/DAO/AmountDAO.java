@@ -27,7 +27,8 @@ public class AmountDAO {
             while (resultSet.next()){
                 amountList.add(new Amount(
                         resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                        resultSet.getTimestamp("datetime").toLocalDateTime(),
+                        resultSet.getDouble("exchangeRate")
                 ));
             }
         }catch (SQLException e){
@@ -37,11 +38,12 @@ public class AmountDAO {
     }
 
 public Amount save(Amount toSave, UUID accountId) {
-    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
+    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id, exchangeRate) VALUES (?, ?, ?, ?);";
     try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
         preparedStatement.setObject(1, accountId);
         preparedStatement.setDouble(2, toSave.getAmount());
         preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+        preparedStatement.setObject(4, toSave.getExchangeRate());
         int rowAdded = preparedStatement.executeUpdate();
         if (rowAdded > 0) {
             return toSave;
@@ -61,6 +63,7 @@ public Amount save(Amount toSave, UUID accountId) {
                 preparedStatement.setObject(1, accountId);
                 preparedStatement.setDouble(2, amount.getAmount());
                 preparedStatement.setTimestamp(3, Timestamp.valueOf(amount.getDateTime()));
+                preparedStatement.setDouble(4,amount.getExchangeRate());
     
                 preparedStatement.addBatch();
             }
@@ -84,7 +87,8 @@ public Amount save(Amount toSave, UUID accountId) {
             if (resultSet.next()) {
                 lastAmount = new Amount(
                         resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                        resultSet.getTimestamp("datetime").toLocalDateTime(),
+                        resultSet.getDouble("exchangeRate")
                 );
             }
         } catch (SQLException e) {
@@ -105,7 +109,8 @@ public Amount save(Amount toSave, UUID accountId) {
             if (resultSet.next()) {
                 amount = new Amount(
                         resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                        resultSet.getTimestamp("datetime").toLocalDateTime(),
+                        resultSet.getDouble("exchangeRate")
                 );
             }
         } catch (SQLException e) {
