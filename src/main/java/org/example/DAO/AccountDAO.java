@@ -10,52 +10,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AccountDAO{
+public class AccountDAO {
     private final DatabaseConnection connection;
-    private AmountDAO amountDAO;
-    private TransactionDAO transactionDAO;
+    private final AmountDAO amountDAO;  // Assurez-vous d'initialiser amountDAO dans le constructeur
+    private final TransactionDAO transactionDAO;  // Assurez-vous d'initialiser transactionDAO dans le constructeur
 
     public AccountDAO() {
-        this.connection = new DatabaseConnection(); // Initialize the connection object
+        this.connection = new DatabaseConnection(); // Initialise l'objet de connexion
+        this.amountDAO = new AmountDAO();  // Initialisez amountDAO ici ou dans le constructeur
+        this.transactionDAO = new TransactionDAO();  // Initialisez transactionDAO ici ou dans le constructeur
     }
-    // find all account without their amount and transaction
-    public List<Account> findAll() {
 
+    // Trouve tous les comptes sans leurs montants et transactions associées
+    public List<Account> findAll() {
         List<Account> accountList = new ArrayList<>();
 
-        String sql= "SELECT * FROM account ;";
+        String sql = "SELECT * FROM account;";
 
         try (Statement statement = connection.getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery(sql)) {
-            while (resultSet.next()){
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
                 accountList.add(new Account(
-                        (UUID) resultSet.getObject("account_id"),
+                        UUID.fromString(resultSet.getString("account_id")),
                         resultSet.getString("account_name"),
                         (Currency) resultSet.getObject("account_currency"),
                         resultSet.getString("account_type")
                 ));
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return accountList;
     }
-    // save a list account with name, currency, type
+
+    // Enregistre une liste de comptes avec nom, devise et type
     public List<Account> saveAll(List<Account> toSave) {
         String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
-    
+
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             for (Account account : toSave) {
                 preparedStatement.setString(1, account.getAccountName());
                 preparedStatement.setObject(2, account.getCurrency());
                 preparedStatement.setString(3, account.getAccountType());
-    
+
                 preparedStatement.addBatch();
             }
-    
+
             int[] rowsAdded = preparedStatement.executeBatch();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-    
+
             List<Account> savedAccounts = new ArrayList<>();
             for (int i = 0; i < rowsAdded.length; i++) {
                 if (rowsAdded[i] > 0 && generatedKeys.next()) {
@@ -74,93 +77,92 @@ public class AccountDAO{
             return null;
         }
     }
-    
 
-    // show amount today
-    public double currentBalance(UUID accountId){
+    // Affiche le solde actuel
+    public double currentBalance(UUID accountId) {
         double amount = 0;
-        String sql = "SELECT amount\n" +
-                "FROM amount\n" +
-                "WHERE account_id = "+ accountId+"\n" +
-                "ORDER BY datetime DESC\n" +
-                "LIMIT 1;" ;
-        try (Statement statement = connection.getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(sql)){
-            while (resultSet.next()){
-                amount = resultSet.getDouble("amount");
+        String sql = "SELECT amount FROM amount WHERE account_id = ? ORDER BY datetime DESC LIMIT 1;";
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    amount = resultSet.getDouble("amount");
+                }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return amount;
     }
 
-    // show an account with all parameter
-    public List<Account> findAccount(UUID accountId){
-        String sql = "SELECT * FROM account where account_id = "+ accountId + ";" ;
+    // Affiche un compte avec tous les paramètres
+    public List<Account> findAccount(UUID accountId) {
+        String sql = "SELECT * FROM account WHERE account_id = ?;";
         List<Account> accountList = new ArrayList<>();
-        try (Statement statement = connection.getConnection().createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-            while (resultSet.next()){
-                accountList.add(new Account)(
-                        (UUID) resultSet.getObject("account_id"),
-                        resultSet.getString("account_name"),
-                        amountDAO.findLastAmount(accountId),
-                        transactionDAO.findAll(accountId),
-                        (Currency) resultSet.getObject("account_currency"),
-                        resultSet.getString("account_type")
-                )
-                );
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    accountList.add(new Account(
+                            UUID.fromString(resultSet.getString("account_id")),
+                            resultSet.getString("account_name"),
+                            amountDAO.findLastAmount(accountId),
+                            transactionDAO.findAll(accountId),
+                            (Currency) resultSet.getObject("account_currency"),
+                            resultSet.getString("account_type")
+                    ));
+                }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return accountList;
     }
 
-    // show amount at a date
-    public double balanceAtADate(UUID accountId, LocalDateTime dateTime){
+    // Affiche le solde à une date donnée
+    public double balanceAtADate(UUID accountId, LocalDateTime dateTime) {
         double amount = 0;
-        String sql = "SELECT amount \n" +
-                "FROM amount\n" +
-                "WHERE \n" +
-                "    account_id = " + accountId + " AND\n" +
-                "    datetime <= "+ dateTime +"" +
-                "ORDER BY datetime DESC\n" +
-                "LIMIT 1;";
-        try (Statement statement = connection.getConnection().createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)){
-            while (resultSet.next()){
-                amount = resultSet.getDouble("amount");
+        String sql = "SELECT amount FROM amount WHERE account_id = ? AND datetime <= ? ORDER BY datetime DESC LIMIT 1;";
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, Timestamp.valueOf(dateTime));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    amount = resultSet.getDouble("amount");
+                }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return amount;
     }
 
-    // show amount of an account between a date
-    public double balanceHistory(UUID accountId, LocalDateTime startDate, LocalDateTime endDate){
-        double amount = 0 ;
-        String sql = "SELECT * \n" +
-                "FROM amount\n" +
-                "WHERE \n" +
-                "    account_id = "+ accountId +" AND\n" +
-                "    datetime BETWEEN "+ startDate +" AND "+ endDate +";" ;
-        try (Statement statement = connection.getConnection().createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)){
-            while (resultSet.next()){
-                amount = resultSet.getDouble("amount");
+    // Affiche le solde d'un compte entre deux dates
+    public double balanceHistory(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        double amount = 0;
+        String sql = "SELECT amount FROM amount WHERE account_id = ? AND datetime BETWEEN ? AND ?;";
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, Timestamp.valueOf(startDate));
+            preparedStatement.setObject(3, Timestamp.valueOf(endDate));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    amount += resultSet.getDouble("amount");
+                }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return amount;
     }
 
-    @Override
-    public Account save(Account toSave) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
+    // La méthode save de l'interface DAOInterface n'est pas implémentée ici, vous pouvez ajouter votre propre logique si nécessaire.
 }
