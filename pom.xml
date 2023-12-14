@@ -26,7 +26,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-<<<<<<< HEAD
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>RELEASE</version>
@@ -37,17 +36,11 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>compile</scope>
-=======
-    <groupId>junit</groupId>
-    <artifactId>junit</artifactId>
-    <version>4.13.2</version>
-    <scope>test</scope>
-</dependency>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.10.1</version>
->>>>>>> 75578a7 (feat: add test find all)
         </dependency>
     </dependencies>
 </project>
