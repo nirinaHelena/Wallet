@@ -1,10 +1,18 @@
 package org.example.Service;
 
+import org.example.databaseConfiguration.DatabaseConnection;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class BalanceCalculator {
+    private final DatabaseConnection connection;
+
+    public BalanceCalculator() {
+        this.connection = new DatabaseConnection();
+    }
+
     // Fonction pour calculer la somme des entrées et sorties d'argent entre une plage de dates donnée
     public double calculateBalance(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COALESCE(SUM(CASE WHEN t.transaction_type = 'credit' THEN t.transaction_amount ELSE -t.transaction_amount END), 0) " +
@@ -12,8 +20,7 @@ public class BalanceCalculator {
                 "WHERE t.account_id = ? " +
                 "AND t.transaction_date_hour BETWEEN ? AND ?";
 
-        try (Connection connection = DriverManager.getConnection("jdbc:your_database_url", "your_username", "your_password");
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setObject(1, accountId);
             preparedStatement.setTimestamp(2, Timestamp.valueOf(startDate));
@@ -43,8 +50,7 @@ public class BalanceCalculator {
                 "WHERE t.account_id = ? " +
                 "AND t.transaction_date_hour BETWEEN ? AND ?";
 
-        try (Connection connection = DriverManager.getConnection("jdbc:your_database_url", "your_username", "your_password");
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setObject(1, accountId);
             preparedStatement.setTimestamp(2, Timestamp.valueOf(startDate));
