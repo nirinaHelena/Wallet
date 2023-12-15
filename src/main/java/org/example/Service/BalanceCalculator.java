@@ -69,10 +69,25 @@ public class BalanceCalculator {
 
         return categoryAmounts;
     }
+    
     // Calcule la somme des entrées et sorties d'argent entre la plage de dates donnée
     public double getSumOfAmountsBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Transaction> transactions = findAll(accountId, startDate, endDate);
         return transactions.stream().mapToDouble(Transaction::getAmount).sum();
+    }
+
+    // Calcule la somme des montants de chaque catégorie entre la plage de dates donnée
+    public Map<String, Double> getSumOfAmountsByCategoryBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Transaction> transactions = findAll(accountId, startDate, endDate);
+
+        Map<String, Double> categoryAmounts = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            String transactionType = transaction.getTransactionType();
+            double totalAmount = categoryAmounts.getOrDefault(transactionType, 0.0);
+            totalAmount += transaction.getAmount();
+            categoryAmounts.put(transactionType, totalAmount);
+        }
+        return categoryAmounts;
     }
 }
 
