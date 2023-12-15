@@ -49,3 +49,7 @@ CREATE TABLE IF NOT EXISTS transaction_category (
 -- update table transaction to add catégorie
 ALTER TABLE transaction
 ADD COLUMN category_id int REFERENCES transaction_category(category_id);
+
+-- add unique constraint on category_name in transaction_category
+ALTER TABLE transaction_category
+ADD CONSTRAINT unique_category_name UNIQUE (category_name);
