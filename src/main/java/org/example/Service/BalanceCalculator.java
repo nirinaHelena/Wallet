@@ -63,22 +63,5 @@ public class BalanceCalculator {
 
         return categoryAmounts;
     }
-
-    public static void main(String[] args) {
-        BalanceCalculator balanceCalculator = new BalanceCalculator();
-
-        // Exemple d'utilisation de la fonction calculateBalance
-        UUID accountId = UUID.fromString("your_account_id");
-        LocalDateTime startDate = LocalDateTime.parse("2023-01-01T00:00:00");
-        LocalDateTime endDate = LocalDateTime.parse("2023-12-31T23:59:59");
-
-        double totalBalance = balanceCalculator.calculateBalance(accountId, startDate, endDate);
-        System.out.println("Total Balance: " + totalBalance);
-
-        // Exemple d'utilisation de la fonction calculateCategoryAmounts
-        Map<String, Double> categoryAmounts = balanceCalculator.calculateCategoryAmounts(accountId, startDate, endDate);
-        System.out.println("Restaurant Amount: " + categoryAmounts.get("restaurant"));
-        System.out.println("Salaire Amount: " + categoryAmounts.get("salaire"));
-    }
 }
 
