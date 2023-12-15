@@ -88,17 +88,27 @@ public class BalanceCalculator {
     }
 
     // Calcule la somme des montants de chaque catégorie entre la plage de dates donnée
-    public Map<String, Double> getSumOfAmountsByCategoryBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Transaction> transactions = findAll(accountId, startDate, endDate);
+public Map<String, Double> getSumOfAmountsByCategoryBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    List<Transaction> transactions = findAll(accountId, startDate, endDate);
 
-        Map<String, Double> categoryAmounts = new HashMap<>();
-        for (Transaction transaction : transactions) {
+    Map<String, Double> categoryAmounts = new HashMap<>();
+    for (Transaction transaction : transactions) {
             String transactionType = transaction.getTransactionType();
             double totalAmount = categoryAmounts.getOrDefault(transactionType, 0.0);
-            totalAmount += transaction.getAmount();
+
+            if ("debit".equals(transactionType)) {
+                totalAmount -= transaction.getAmount();
+            } else if ("credit".equals(transactionType)) {
+                totalAmount += transaction.getAmount();
+            }
+
             categoryAmounts.put(transactionType, totalAmount);
         }
-        return categoryAmounts;
-    }
+    Map<String, Double> sortedCategoryAmounts = new TreeMap<>(categoryAmounts);
+
+    return sortedCategoryAmounts;
+    
+}
+
 }
 
