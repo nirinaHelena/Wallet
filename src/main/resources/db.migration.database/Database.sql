@@ -29,8 +29,6 @@ CREATE TABLE IF NOT EXISTS amount (
     amount double precision NOT NULL,
     datetime timestamp
 );
-<<<<<<< HEAD
-=======
 
 -- create table transfer_history
 CREATE TABLE IF NOT EXISTS transfer_history (
@@ -40,4 +38,3 @@ CREATE TABLE IF NOT EXISTS transfer_history (
     transfer_amount double precision NOT NULL,
     transfer_date_hour timestamp DEFAULT CURRENT_TIMESTAMP
 );
->>>>>>> fe8893c (fix: add default value of transfer date)
