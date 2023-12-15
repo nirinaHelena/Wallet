@@ -1,4 +1,4 @@
--- show all account whith all args
+-- show all account with all args
 SELECT
     a.account_id AS "ID",
     a.account_name AS "Nom",

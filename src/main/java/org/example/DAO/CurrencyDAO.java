@@ -38,7 +38,9 @@ public class CurrencyDAO implements DAOInterface<Currency> {
     public Currency save(Currency toSave) {
         String sql = "INSERT INTO currency (currency_name, currency_code) VALUES (?, ?);";
 
-        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             preparedStatement.setString(1, toSave.getCurrencyName());
             preparedStatement.setString(2, toSave.getCurrencyCode());
 

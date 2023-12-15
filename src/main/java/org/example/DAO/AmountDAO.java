@@ -27,7 +27,8 @@ public class AmountDAO {
             while (resultSet.next()){
                 amountList.add(new Amount(
                         resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                        resultSet.getTimestamp("datetime").toLocalDateTime(),
+                        resultSet.getDouble("exchangeRate")
                 ));
             }
         }catch (SQLException e){
@@ -37,12 +38,16 @@ public class AmountDAO {
     }
 
 public Amount save(Amount toSave, UUID accountId) {
-    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id) VALUES (?, ?, ?, ?);";
+
+    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id, exchangeRate) VALUES (?, ?, ?, ?);";
 
     try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
         preparedStatement.setObject(1, accountId);
         preparedStatement.setDouble(2, toSave.getAmount());
         preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+
+        preparedStatement.setObject(4, toSave.getExchangeRate());
+
         int rowAdded = preparedStatement.executeUpdate();
         if (rowAdded > 0) {
             return toSave;
@@ -62,6 +67,7 @@ public Amount save(Amount toSave, UUID accountId) {
                 preparedStatement.setObject(1, accountId);
                 preparedStatement.setDouble(2, amount.getAmount());
                 preparedStatement.setTimestamp(3, Timestamp.valueOf(amount.getDateTime()));
+                preparedStatement.setDouble(4,amount.getExchangeRate());
     
                 preparedStatement.addBatch();
             }
@@ -85,7 +91,8 @@ public Amount save(Amount toSave, UUID accountId) {
             if (resultSet.next()) {
                 lastAmount = new Amount(
                         resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                        resultSet.getTimestamp("datetime").toLocalDateTime(),
+                        resultSet.getDouble("exchangeRate")
                 );
             }
         } catch (SQLException e) {
@@ -106,7 +113,8 @@ public Amount save(Amount toSave, UUID accountId) {
             if (resultSet.next()) {
                 amount = new Amount(
                         resultSet.getDouble("amount"),
-                        resultSet.getTimestamp("datetime").toLocalDateTime()
+                        resultSet.getTimestamp("datetime").toLocalDateTime(),
+                        resultSet.getDouble("exchangeRate")
                 );
             }
         } catch (SQLException e) {
@@ -117,5 +125,56 @@ public Amount save(Amount toSave, UUID accountId) {
     
     public Amount findCurrentAmount(UUID accountId) {
         return findLastAmount(accountId);
+    }
+
+    public double weightedAverageExchange(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT AVG(exchange_rate) AS weighted_average " +
+                "FROM amount " +
+                "WHERE account_id = ? AND DATE(datetime) = ?;";
+
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, date);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("weighted_average");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0; // Valeur par défaut si quelque chose ne fonctionne pas
+    }
+
+    public double getMinimumExchangeRate(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT MIN(exchange_rate) FROM amount WHERE account_id = ? AND datetime::DATE = ?;";
+        return getExchangeRate(accountId, date, sql);
+    }
+
+    public double getMaximumExchangeRate(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT MAX(exchange_rate) FROM amount WHERE account_id = ? AND datetime::DATE = ?;";
+        return getExchangeRate(accountId, date, sql);
+    }
+
+    public double getMedianExchangeRate(UUID accountId, LocalDateTime date) {
+        String sql = "SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY exchange_rate) " +
+                "FROM amount WHERE account_id = ? AND datetime::DATE = ?;";
+        return getExchangeRate(accountId, date, sql);
+    }
+    private double getExchangeRate(UUID accountId, LocalDateTime date, String sql) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, Timestamp.valueOf(date));
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0; // Remplacez cette valeur par une valeur par défaut ou une gestion d'erreur appropriée
     }
 }    
