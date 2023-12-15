@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 public class AccountDAO implements DAOInterface<Account>{
     private final DatabaseConnection connection;
     private final AmountDAO amountDAO;
@@ -22,14 +23,18 @@ public class AccountDAO implements DAOInterface<Account>{
     }
 
     // Trouve tous les comptes sans leurs montants et transactions associées
+
+
     public List<Account> findAll() {
         List<Account> accountList = new ArrayList<>();
+
 
         String sql = "SELECT * FROM account;";
 
         try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
+
                 accountList.add(new Account(
                         UUID.fromString(resultSet.getString("account_id")),
                         resultSet.getString("account_name"),
@@ -43,14 +48,16 @@ public class AccountDAO implements DAOInterface<Account>{
         return accountList;
     }
 
+
     // Enregistre une liste de comptes avec nom, devise et type
     public List<Account> saveAll(List<Account> toSave) {
         String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
 
+
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             for (Account account : toSave) {
                 preparedStatement.setString(1, account.getAccountName());
-                preparedStatement.setObject(2, account.getCurrency());
+                preparedStatement.setObject(2, account.getCurrency().getCurrencyId());
                 preparedStatement.setString(3, account.getAccountType());
 
                 preparedStatement.addBatch();
@@ -117,6 +124,7 @@ public class AccountDAO implements DAOInterface<Account>{
     // Affiche le solde actuel
     public double currentBalance(UUID accountId) {
         double amount = 0;
+
         String sql = "SELECT amount FROM amount WHERE account_id = ? ORDER BY datetime DESC LIMIT 1;";
 
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
@@ -126,6 +134,7 @@ public class AccountDAO implements DAOInterface<Account>{
                 while (resultSet.next()) {
                     amount = resultSet.getDouble("amount");
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -152,6 +161,7 @@ public class AccountDAO implements DAOInterface<Account>{
                             resultSet.getString("account_type")
                     ));
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -162,6 +172,7 @@ public class AccountDAO implements DAOInterface<Account>{
     // Affiche le solde à une date donnée
     public double balanceAtADate(UUID accountId, LocalDateTime dateTime) {
         double amount = 0;
+
         String sql = "SELECT amount FROM amount WHERE account_id = ? AND datetime <= ? ORDER BY datetime DESC LIMIT 1;";
 
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
@@ -172,12 +183,14 @@ public class AccountDAO implements DAOInterface<Account>{
                 while (resultSet.next()) {
                     amount = resultSet.getDouble("amount");
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return amount;
     }
+
 
     // Affiche le solde d'un compte entre deux dates
     public double balanceHistory(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
@@ -193,6 +206,7 @@ public class AccountDAO implements DAOInterface<Account>{
                 while (resultSet.next()) {
                     amount += resultSet.getDouble("amount");
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -8,7 +8,9 @@ public class CurrencyTest {
         System.out.println("Test currency dao");
         CurrencyDAO currencyDAO= new CurrencyDAO();
         System.out.println("find all currency"+ currencyDAO.findAll());
+
         Currency euro= new Currency(null,"Euro", "EUR");
+
         System.out.println("save a currency"+ currencyDAO.save(euro));
     }
 }
