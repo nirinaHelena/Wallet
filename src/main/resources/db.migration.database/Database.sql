@@ -4,12 +4,6 @@
 -- TODO: update table transaction as "transaction"
 
 
--- create table amount
-CREATE TABLE IF NOT EXISTS amount (
-    account_id int REFERENCES account(account_id),
-    amount double precision NOT NULL,
-    datetime timestamp
-);
 
 -- create table transfer_history
 CREATE TABLE IF NOT EXISTS transfer_history (
