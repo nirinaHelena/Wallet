@@ -1,12 +1,3 @@
-
-
-
--- TODO: update table transaction as "transaction"
-
-
-
-
-
 -- update table transaction to add catégorie
 ALTER TABLE transaction
 ADD COLUMN category_id int REFERENCES transaction_category(category_id);
