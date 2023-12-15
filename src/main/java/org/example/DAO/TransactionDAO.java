@@ -118,4 +118,31 @@ public class TransactionDAO {
         }
         return transactionList;
     }
+    // Retourne toutes les transactions dans la plage de dates donnée
+    public List<Transaction> findAll(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Transaction> transactionList = new ArrayList<>();
+        String sql = "SELECT * FROM transaction WHERE account_id = ? AND transaction_date_hour BETWEEN ? AND ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setObject(1, accountId);
+            preparedStatement.setObject(2, startDate);
+            preparedStatement.setObject(3, endDate);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    transactionList.add(new Transaction(
+                            (UUID) resultSet.getObject("transaction_id"),
+                            (UUID) resultSet.getObject("account_id"),
+                            resultSet.getString("transaction_label"),
+                            resultSet.getDouble("transaction_amount"),
+                            resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
+                            resultSet.getString("transaction_type")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactionList;
+    }
 }
