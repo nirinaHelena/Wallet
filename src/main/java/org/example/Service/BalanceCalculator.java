@@ -73,7 +73,18 @@ public class BalanceCalculator {
     // Calcule la somme des entrées et sorties d'argent entre la plage de dates donnée
     public double getSumOfAmountsBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Transaction> transactions = findAll(accountId, startDate, endDate);
-        return transactions.stream().mapToDouble(Transaction::getAmount).sum();
+
+        double totalAmount = 0.0;
+
+        for (Transaction transaction : transactions) {
+            if ("debit".equals(transaction.getTransactionType())) {
+                totalAmount -= transaction.getAmount();
+            } else if ("credit".equals(transaction.getTransactionType())) {
+                totalAmount += transaction.getAmount();
+            }
+        }
+    
+        return totalAmount;
     }
 
     // Calcule la somme des montants de chaque catégorie entre la plage de dates donnée
