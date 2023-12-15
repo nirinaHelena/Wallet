@@ -53,3 +53,7 @@ ADD COLUMN category_id int REFERENCES transaction_category(category_id);
 -- add unique constraint on category_name in transaction_category
 ALTER TABLE transaction_category
 ADD CONSTRAINT unique_category_name UNIQUE (category_name);
+
+-- add NOT NULL constraint on category_id in transaction
+ALTER TABLE transaction
+ALTER COLUMN category_id SET NOT NULL;
