@@ -24,11 +24,15 @@ public class CurrencyDAO implements DAOInterface<Currency> {
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 currencyList.add(new Currency(
-                        (UUID) resultSet.getObject("currency_id"),
+                        resultSet.getInt("currency_id"),
                         resultSet.getString("currency_name"),
                         resultSet.getString("currency_code")
                 ));
+                for (Currency currency : currencyList){
+                    currency.toString();
+                }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

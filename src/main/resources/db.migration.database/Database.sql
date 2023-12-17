@@ -40,3 +40,11 @@ CREATE TABLE IF NOT EXISTS transfer_history (
     transfer_date_hour timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
+--create table currency_value
+CREATE TABLE currency_value(
+    currency_id serial PRIMARY KEY,
+    currency_id_source int not null,
+    currency_id_destination int not null,
+    currency_value double precision NOT NULL,
+    effect_date timestamp default CURRENT_TIMESTAMP
+);

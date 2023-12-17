@@ -1,4 +1,4 @@
-package org.example.DAO;
+package org.example.model;
 
 import lombok.*;
 
@@ -12,9 +12,9 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 public class CurrencyValue {
-    private UUID currencyId;
-    private UUID currencyIdSource;
-    private UUID currencyIdDestination;
+    private int currencyId;
+    private int currencyIdSource;
+    private int currencyIdDestination;
     private double Value;
     private LocalDateTime effectDate;
 }

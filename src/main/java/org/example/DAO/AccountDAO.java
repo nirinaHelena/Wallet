@@ -2,7 +2,6 @@ package org.example.DAO;
 
 import org.example.databaseConfiguration.DatabaseConnection;
 import org.example.model.Account;
-import org.example.model.Currency;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -36,9 +35,9 @@ public class AccountDAO implements DAOInterface<Account>{
             while (resultSet.next()) {
 
                 accountList.add(new Account(
-                        UUID.fromString(resultSet.getString("account_id")),
+                        resultSet.getInt("account_id"),
                         resultSet.getString("account_name"),
-                        (Currency) resultSet.getObject("account_currency"),
+                        resultSet.getInt("account_currency"),
                         resultSet.getString("account_type")
                 ));
             }
@@ -51,47 +50,24 @@ public class AccountDAO implements DAOInterface<Account>{
 
     // Enregistre une liste de comptes avec nom, devise et type
     public List<Account> saveAll(List<Account> toSave) {
-        String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
+        List<Account> currencyList = new ArrayList<>();
 
-
-        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            for (Account account : toSave) {
-                preparedStatement.setString(1, account.getAccountName());
-                preparedStatement.setObject(2, account.getCurrency().getCurrencyId());
-                preparedStatement.setString(3, account.getAccountType());
-
-                preparedStatement.addBatch();
+        for (Account account : toSave) {
+            Account saveAccount = save(account);
+            if (saveAccount != null) {
+                currencyList.add(saveAccount);
             }
-
-            int[] rowsAdded = preparedStatement.executeBatch();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-
-            List<Account> savedAccounts = new ArrayList<>();
-            for (int i = 0; i < rowsAdded.length; i++) {
-                if (rowsAdded[i] > 0 && generatedKeys.next()) {
-                    Account savedAccount = new Account(
-                            UUID.fromString(generatedKeys.getString(1)),
-                            toSave.get(i).getAccountName(),
-                            toSave.get(i).getCurrency(),
-                            toSave.get(i).getAccountType()
-                    );
-                    savedAccounts.add(savedAccount);
-                }
-            }
-            return savedAccounts;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
         }
+        return currencyList;
     }
 
     @Override
     public Account save(Account toSave) {
         String sql = "INSERT INTO account (account_name, account_currency, account_type) VALUES (?, ?, ?);";
 
-        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, toSave.getAccountName());
-            preparedStatement.setObject(2, toSave.getCurrency());
+            preparedStatement.setInt(2, toSave.getCurrency());
             preparedStatement.setString(3, toSave.getAccountType());
 
             int rowsAdded = preparedStatement.executeUpdate();
@@ -103,7 +79,6 @@ public class AccountDAO implements DAOInterface<Account>{
 
                         // Crée un nouvel objet Account avec l'ID généré
                         Account savedAccount = new Account(
-                                generatedAccountId,
                                 toSave.getAccountName(),
                                 toSave.getCurrency(),
                                 toSave.getAccountType()
@@ -122,7 +97,7 @@ public class AccountDAO implements DAOInterface<Account>{
 
 
     // Affiche le solde actuel
-    public double currentBalance(UUID accountId) {
+    public double currentBalance(int accountId) {
         double amount = 0;
 
         String sql = "SELECT amount FROM amount WHERE account_id = ? ORDER BY datetime DESC LIMIT 1;";
@@ -143,7 +118,7 @@ public class AccountDAO implements DAOInterface<Account>{
     }
 
     // Affiche un compte avec tous les paramètres
-    public List<Account> findAccount(UUID accountId) {
+    public List<Account> findAccount(int accountId) {
         String sql = "SELECT * FROM account WHERE account_id = ?;";
         List<Account> accountList = new ArrayList<>();
 
@@ -153,11 +128,11 @@ public class AccountDAO implements DAOInterface<Account>{
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     accountList.add(new Account(
-                            UUID.fromString(resultSet.getString("account_id")),
+                            resultSet.getInt("account_id"),
                             resultSet.getString("account_name"),
                             amountDAO.findLastAmount(accountId),
-                            transactionDAO.findAll(accountId),
-                            (Currency) resultSet.getObject("account_currency"),
+                            transactionDAO.findAllAtDate(accountId),
+                            resultSet.getInt("account_currency"),
                             resultSet.getString("account_type")
                     ));
                 }
@@ -214,7 +189,7 @@ public class AccountDAO implements DAOInterface<Account>{
         return amount;
     }
 
-    public <ExchangeRateCalculationMethod> double currentBalance(UUID accountId, LocalDateTime date, ExchangeRateCalculationMethod method) {
+    public <ExchangeRateCalculationMethod> double currentBalance(int accountId, LocalDateTime date, ExchangeRateCalculationMethod method) {
         double exchangeRate;
 
         if (method.equals(method)) {
