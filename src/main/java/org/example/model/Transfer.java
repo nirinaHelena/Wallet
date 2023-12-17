@@ -11,15 +11,15 @@ import java.util.UUID;
 @Getter
 @ToString
 public class Transfer {
-    private UUID transferId;
-    private UUID senderAccountId;
-    private UUID receiverAccountId;
+    private int transferId;
+    private int senderAccountId;
+    private int receiverAccountId;
     private Amount transferAmount;
     private LocalDateTime dateTime;
 
     // constructor without transfer id
 
-    public Transfer(UUID senderAccountId, UUID receiverAccountId,
+    public Transfer(int senderAccountId, int receiverAccountId,
                     Amount transferAmount, LocalDateTime dateTime) {
         this.senderAccountId = senderAccountId;
         this.receiverAccountId = receiverAccountId;
