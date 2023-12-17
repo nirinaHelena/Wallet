@@ -230,7 +230,7 @@ public class AccountDAO implements DAOInterface<Account>{
         }
 
         // Obtenez le solde actuel de l'account, ajusté en fonction du taux de change
-        double currentBalance = amountDAO.currentBalance(accountId, date);
+        double currentBalance = amountDAO.findLastAmount(accountId).getAmount();
         double adjustedBalance = currentBalance * exchangeRate;
 
         return adjustedBalance;
