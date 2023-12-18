@@ -5,6 +5,7 @@ import org.example.DAO.CurrencyDAO;
 import org.example.DAO.TransactionDAO;
 import org.example.Service.BalanceCalculator;
 import org.example.model.Account;
+import org.example.model.Category;
 import org.example.model.Currency;
 import org.example.model.Transaction;
 
@@ -21,6 +22,7 @@ public class Main {
             CurrencyDAO currencyDAO = new CurrencyDAO();
             AccountDAO accountDAO = new AccountDAO();
             TransactionDAO transactionDAO = new TransactionDAO();
+
             /**
              // Création de quelques devises
              Currency ariary = new Currency(null,"Ariary", "MGA");
@@ -47,7 +49,7 @@ public class Main {
             Account account2 = new Account("courant", 1, "banque");
 
             // Enregistrement des comptes dans la base de données
-            accountDAO.saveAll(List.of(account1, account2));
+            //accountDAO.saveAll(List.of(account1, account2));
 
             System.out.println("=".repeat(30));
 
@@ -61,10 +63,10 @@ public class Main {
             System.out.println("=".repeat(30));
             System.out.println("save transaction");
 
-            Transaction transaction1 = new Transaction(4, "vente",
+            Transaction transaction1 = new Transaction(65, "vente",
                     100.0, null, "credit", 1);
 
-            Transaction transaction2 = new Transaction(4, "achat",
+            Transaction transaction2 = new Transaction(65, "achat",
                     5.0, null, "debit", 1);
             // Enregistrement des transactions dans la base de données
             System.out.println("save transaction 1");
@@ -79,6 +81,9 @@ public class Main {
                 double currentBalance = accountDAO.currentBalance(account1.getAccountId());
                 System.out.println("Solde de " + account.getAccountName() + ": " + currentBalance);
             }
+
+            System.out.println("=".repeat(30));
+            System.out.println("create category");
 
             System.out.println("=".repeat(30));
 
