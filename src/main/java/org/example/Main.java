@@ -17,69 +17,95 @@ import java.util.UUID;
 public class Main {
 
     public static void main(String[] args) {
-        CurrencyDAO currencyDAO = new CurrencyDAO();
-        AccountDAO accountDAO = new AccountDAO();
-        TransactionDAO transactionDAO = new TransactionDAO();
+        {
+            CurrencyDAO currencyDAO = new CurrencyDAO();
+            AccountDAO accountDAO = new AccountDAO();
+            TransactionDAO transactionDAO = new TransactionDAO();
+            /**
+             // Création de quelques devises
+             Currency ariary = new Currency(null,"Ariary", "MGA");
+             Currency usd = new Currency(null,"Dollar", "USD");
+             */
 
-        // Création de quelques devises
-        //Currency ariary = new Currency(null,"Ariary", "MGA");
-        //Currency usd = new Currency(null,"Dollar", "USD");
+            // voir la liste de currency
+            Currency MGA = new Currency(1, "Ariary", "MGA");
+            Currency USD = new Currency(2, "Dollar", "USD");
+            System.out.println("=".repeat(30));
+            System.out.println("enregistrer un currency");
+            /**
+             // Enregistrement des devises dans la base de données
+             currencyDAO.saveAll(List.of(ariary, usd));
+             */
+            System.out.println("=".repeat(30));
+            // find all currency
+            System.out.println("find all currency");
+            System.out.println(currencyDAO.findAll());
+            System.out.println("=".repeat(30));
+            System.out.println("créer des comptes");
+            //enregistrer quelques comptes
+            Account account1 = new Account("courant", 2, "banque");
+            Account account2 = new Account("courant", 1, "banque");
 
-        // Enregistrement des devises dans la base de données
-        //currencyDAO.saveAll(List.of(ariary, usd));
+            // Enregistrement des comptes dans la base de données
+            accountDAO.saveAll(List.of(account1, account2));
 
-        // Création de quelques comptes
-        //Account account1 = new Account("Compte 1", 1, "banque");
-        //Account account2 = new Account("Compte 2", 2, "banque");
+            System.out.println("=".repeat(30));
 
-        // Enregistrement des comptes dans la base de données
-        //accountDAO.saveAll(List.of(account1, account2));
+            // afficher tous les comptes enregistrer
+            System.out.println("find all account");
+            System.out.println(accountDAO.findAll());
+            System.out.println("=".repeat(30));
 
-        // Création de quelques transactions
-        Transaction transaction1 = new Transaction(account1.getAccountId(), "Achat", 100.0, LocalDateTime.now(), "debit");
-        Transaction transaction2 = new Transaction(account2.getAccountId(), "Vente", 50.0, LocalDateTime.now(), "credit");
 
-        // Enregistrement des transactions dans la base de données
-        transactionDAO.save(transaction1, account1, 10);
-        transactionDAO.save(transaction2, account2, 8.5);
+            // Création de quelques transactions
+            System.out.println("=".repeat(30));
+            System.out.println("save transaction");
 
-        // Affichage de tous les comptes
-        List<Account> allAccounts = accountDAO.findAll();
-        System.out.println("Liste de tous les comptes : ");
-        for (Account account : allAccounts) {
-            System.out.println(account);
-        }
+            Transaction transaction1 = new Transaction(4, "vente", 100.0, null, "credit", 1);
+            Transaction transaction2 = new Transaction(4, "achat", 5.0, null, "debit", 1);
+            // Enregistrement des transactions dans la base de données
+            System.out.println("save transaction 1");
+            transactionDAO.save(transaction1);
+            transactionDAO.save(transaction2);
 
-        // Affichage du solde actuel de chaque compte
-        System.out.println("\nSolde actuel de chaque compte : ");
-        for (Account account : allAccounts) {
-            double currentBalance = accountDAO.currentBalance(account.getAccountId());
-            System.out.println("Solde de " + account.getAccountName() + ": " + currentBalance);
-        }
-
-        // Affichage des transactions de chaque compte
-        System.out.println("\nTransactions de chaque compte : ");
-        for (Account account : allAccounts) {
-            List<Transaction> transactions = transactionDAO.findAll(account.getAccountId());
-            System.out.println("Transactions de " + account.getAccountName() + ": ");
-            for (Transaction transaction : transactions) {
-                System.out.println(transaction);
+            System.out.println("=".repeat(30));
+            List <Account> allAccounts = accountDAO.findAll();
+            // Affichage du solde actuel de chaque compte
+            System.out.println("\nSolde actuel de chaque compte : ");
+            for (Account account : allAccounts) {
+                double currentBalance = accountDAO.currentBalance(account1.getAccountId());
+                System.out.println("Solde de " + account.getAccountName() + ": " + currentBalance);
             }
+
+            System.out.println("=".repeat(30));
+
+            // Affichage des transactions de chaque compte
+            System.out.println("Transactions de chaque compte : ");
+            for (Account account : allAccounts) {
+                List<Transaction> transactions = transactionDAO.findAllAtDate(account.getAccountId());
+                System.out.println("Transactions de " + account.getAccountName() + ": ");
+                for (Transaction transaction : transactions) {
+                    System.out.println(transaction);
+                }
+            }
+            System.out.println("=".repeat(30));
+            System.out.println("la balance de account1");
         }
 
+            System.out.println("=".repeat(30));
         BalanceCalculator balanceCalculator = new BalanceCalculator();
 
         // Exemple d'utilisation de la fonction calculateBalance
-        UUID accountId = UUID.fromString("your_account_id");
         LocalDateTime startDate = LocalDateTime.parse("2023-01-01T00:00:00");
         LocalDateTime endDate = LocalDateTime.parse("2023-12-31T23:59:59");
 
-        double totalBalance = balanceCalculator.calculateBalance(accountId, startDate, endDate);
+        double totalBalance = balanceCalculator.calculateBalance(5, startDate, endDate);
         System.out.println("Total Balance: " + totalBalance);
 
         // Exemple d'utilisation de la fonction calculateCategoryAmounts
-        Map<String, Double> categoryAmounts = balanceCalculator.calculateCategoryAmounts(accountId, startDate, endDate);
+        Map<String, Double> categoryAmounts = balanceCalculator.calculateCategoryAmounts(5, startDate, endDate);
         System.out.println("Restaurant Amount: " + categoryAmounts.get("restaurant"));
         System.out.println("Salaire Amount: " + categoryAmounts.get("salaire"));
     }
 }
+

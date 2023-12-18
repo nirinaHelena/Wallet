@@ -17,6 +17,10 @@ public class TransactionDAO {
     private AccountDAO accountDAO;
     private DatabaseConnection connection;
 
+    public TransactionDAO() {
+        this.connection = new DatabaseConnection();
+    }
+
     public List<Transaction> findAll() {
         List<Transaction> transactionList = new ArrayList<>();
         String sql = "SELECT * FROM transaction ;";
@@ -67,15 +71,15 @@ public class TransactionDAO {
         return transactionList;
     }
     public String  save(Transaction toSave) {
-        String sql = "INSERT INTO transaction (account_id, transaction_label, transaction_amount, transaction_type, exchange_rate) " +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO transaction (account_id, transaction_label, transaction_amount, transaction_type, category_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             preparedStatement.setObject(1, toSave.getAccountId());
             preparedStatement.setString(2, toSave.getTransactionLabel());
             preparedStatement.setDouble(3, toSave.getAmount());
             preparedStatement.setString(4, toSave.getTransactionType());
-            preparedStatement.setDouble(5, toSave.getAmount());
+            preparedStatement.setInt(5, toSave.getCategory());
             // amount * exchange rate
 
 
@@ -140,7 +144,7 @@ public class TransactionDAO {
         return transactionList;
     }
     // Retourne toutes les transactions dans la plage de dates donnée
-    public List<Transaction> findAll(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<Transaction> findAll(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Transaction> transactionList = new ArrayList<>();
         String sql = "SELECT * FROM transaction WHERE account_id = ? AND transaction_date_hour BETWEEN ? AND ?;";
 

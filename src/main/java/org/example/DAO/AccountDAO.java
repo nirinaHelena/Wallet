@@ -75,8 +75,6 @@ public class AccountDAO implements DAOInterface<Account>{
             if (rowsAdded > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        UUID generatedAccountId = UUID.fromString(generatedKeys.getString(1));
-
                         // Crée un nouvel objet Account avec l'ID généré
                         Account savedAccount = new Account(
                                 toSave.getAccountName(),

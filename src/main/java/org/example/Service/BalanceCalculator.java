@@ -1,6 +1,8 @@
 package org.example.Service;
 
+import org.example.DAO.TransactionDAO;
 import org.example.databaseConfiguration.DatabaseConnection;
+import org.example.model.Transaction;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -8,13 +10,14 @@ import java.util.*;
 
 public class BalanceCalculator {
     private final DatabaseConnection connection;
+    private TransactionDAO transactionDAO;
 
     public BalanceCalculator() {
         this.connection = new DatabaseConnection();
     }
 
     // Fonction pour calculer la somme des entrées et sorties d'argent entre une plage de dates donnée
-    public double calculateBalance(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    public double calculateBalance(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
         String sql = "SELECT COALESCE(SUM(CASE WHEN t.transaction_type = 'credit' THEN t.transaction_amount ELSE -t.transaction_amount END), 0) " +
                 "FROM transaction t " +
                 "WHERE t.account_id = ? " +
@@ -40,7 +43,7 @@ public class BalanceCalculator {
     }
 
     // Fonction pour calculer la somme des montants de chaque catégorie entre une plage de dates donnée
-    public Map<String, Double> calculateCategoryAmounts(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    public Map<String, Double> calculateCategoryAmounts(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
         Map<String, Double> categoryAmounts = new HashMap<>();
         String sql = "SELECT " +
                 "COALESCE(SUM(CASE WHEN tc.category_name = 'restaurant' THEN t.transaction_amount ELSE 0 END), 0) AS restaurant, " +
@@ -50,7 +53,7 @@ public class BalanceCalculator {
                 "WHERE t.account_id = ? " +
                 "AND t.transaction_date_hour BETWEEN ? AND ?";
 
-        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
 
             preparedStatement.setObject(1, accountId);
             preparedStatement.setTimestamp(2, Timestamp.valueOf(startDate));
@@ -71,8 +74,8 @@ public class BalanceCalculator {
     }
     
     // Calcule la somme des entrées et sorties d'argent entre la plage de dates donnée
-    public double getSumOfAmountsBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
-        List<Transaction> transactions = findAll(accountId, startDate, endDate);
+    public double getSumOfAmountsBetweenDates(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Transaction> transactions = transactionDAO.findAll(accountId, startDate, endDate);
 
         double totalAmount = 0.0;
 
@@ -88,8 +91,8 @@ public class BalanceCalculator {
     }
 
     // Calcule la somme des montants de chaque catégorie entre la plage de dates donnée
-public Map<String, Double> getSumOfAmountsByCategoryBetweenDates(UUID accountId, LocalDateTime startDate, LocalDateTime endDate) {
-    List<Transaction> transactions = findAll(accountId, startDate, endDate);
+public Map<String, Double> getSumOfAmountsByCategoryBetweenDates(int accountId, LocalDateTime startDate, LocalDateTime endDate) {
+    List<Transaction> transactions = transactionDAO.findAll(accountId, startDate, endDate);
 
     Map<String, Double> categoryAmounts = new HashMap<>();
     for (Transaction transaction : transactions) {

@@ -14,10 +14,10 @@ ALTER COLUMN category_id SET NOT NULL;
 ALTER TABLE transaction
 DROP CONSTRAINT IF EXISTS valid_transaction_type;
 
-ALTER TABLE transaction
-ADD CONSTRAINT valid_transaction_type
-CHECK (
-    (transaction_type = 'debit' AND category_type = 'debit'))
-    OR
-    (transaction_type = 'credit' AND category_type = 'credit'))
-);
+--ALTER TABLE transaction
+--ADD CONSTRAINT transaction_type
+--CHECK (
+  --  (transaction_type = 'debit' AND category_type = 'debit')
+    --OR
+    --(transaction_type = 'credit' AND category_type = 'credit')
+--);

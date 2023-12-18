@@ -16,7 +16,7 @@ public class TransferDAO {
     private AmountDAO amountDAO;
     private AccountDAO accountDAO;
     private CurrencyValueDAO currencyValueDAO;
-    public String save(Transfer transfer){
+    public String save(Transfer transfer, int transactionCategory){
         String sql = "INSERT INTO transfer_history (sender_account_id, receiver_account_id," +
                 "transfer amount) value (?,?, ?) ; " ;
         /**
@@ -42,11 +42,11 @@ public class TransferDAO {
                         // debit senderAccount
                         Transaction debitTransaction = new Transaction( senderAccount.getAccountId(),
                                 null, transfer.getTransferAmount().getAmount(),
-                                null, "debit");
+                                null, "debit", transactionCategory);
 
                         Transaction creditTransaction = new Transaction(receiverAccount.getAccountId(),
                                 null, transfer.getTransferAmount().getAmount(),
-                                null, "credit");
+                                null, "credit", transactionCategory);
 
                         transactionDAO.save(debitTransaction);
                         // credit receiverAccount
@@ -69,14 +69,14 @@ public class TransferDAO {
                         // debit senderAccount
                         Transaction debitTransaction = new Transaction( senderAccount.getAccountId(),
                                 null, transfer.getTransferAmount().getAmount(),
-                                null, "debit");
+                                null, "debit", transactionCategory);
 
                         CurrencyValue  lastCurrencyValue = (CurrencyValue) currencyValueDAO.findLastCurrencyValue();
                         Double creditAmount = transfer.getTransferAmount().getAmount() * lastCurrencyValue.getValue();
 
                         Transaction creditTransaction = new Transaction(receiverAccount.getAccountId(),
                                 null, creditAmount,
-                                null, "credit");
+                                null, "credit", transactionCategory);
 
                         transactionDAO.save(debitTransaction);
                         // credit receiverAccount
