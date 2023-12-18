@@ -61,8 +61,11 @@ public class Main {
             System.out.println("=".repeat(30));
             System.out.println("save transaction");
 
-            Transaction transaction1 = new Transaction(4, "vente", 100.0, null, "credit", 1);
-            Transaction transaction2 = new Transaction(4, "achat", 5.0, null, "debit", 1);
+            Transaction transaction1 = new Transaction(4, "vente",
+                    100.0, null, "credit", 1);
+
+            Transaction transaction2 = new Transaction(4, "achat",
+                    5.0, null, "debit", 1);
             // Enregistrement des transactions dans la base de données
             System.out.println("save transaction 1");
             transactionDAO.save(transaction1);

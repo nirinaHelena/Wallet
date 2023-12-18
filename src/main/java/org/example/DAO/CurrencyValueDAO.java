@@ -16,6 +16,10 @@ import java.util.UUID;
 public class CurrencyValueDAO  {
     private DatabaseConnection connection;
 
+    public CurrencyValueDAO() {
+        this.connection = new DatabaseConnection();
+    }
+
     public List<CurrencyValue> findAll() {
         List<CurrencyValue> currencyValueList = new ArrayList<>();
 
