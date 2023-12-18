@@ -17,7 +17,7 @@ DROP CONSTRAINT IF EXISTS valid_transaction_type;
 ALTER TABLE transaction
 ADD CONSTRAINT valid_transaction_type
 CHECK (
-    (transaction_type = 'debit' AND category_id IS NOT NULL AND EXISTS (SELECT 1 FROM transaction_category WHERE category_id = transaction.category_id AND category_type = 'debit'))
+    (transaction_type = 'debit' AND category_type = 'debit'))
     OR
-    (transaction_type = 'credit' AND category_id IS NOT NULL AND EXISTS (SELECT 1 FROM transaction_category WHERE category_id = transaction.category_id AND category_type = 'credit'))
+    (transaction_type = 'credit' AND category_type = 'credit'))
 );

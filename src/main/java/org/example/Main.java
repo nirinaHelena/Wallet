@@ -22,18 +22,18 @@ public class Main {
         TransactionDAO transactionDAO = new TransactionDAO();
 
         // Création de quelques devises
-        Currency ariary = new Currency(null,"Ariary", "MGA");
-        Currency usd = new Currency(null,"Dollar", "USD");
+        //Currency ariary = new Currency(null,"Ariary", "MGA");
+        //Currency usd = new Currency(null,"Dollar", "USD");
 
         // Enregistrement des devises dans la base de données
-        currencyDAO.saveAll(List.of(ariary, usd));
+        //currencyDAO.saveAll(List.of(ariary, usd));
 
         // Création de quelques comptes
-        Account account1 = new Account("Compte 1", ariary, "banque");
-        Account account2 = new Account("Compte 2", usd, "banque");
+        //Account account1 = new Account("Compte 1", 1, "banque");
+        //Account account2 = new Account("Compte 2", 2, "banque");
 
         // Enregistrement des comptes dans la base de données
-        accountDAO.saveAll(List.of(account1, account2));
+        //accountDAO.saveAll(List.of(account1, account2));
 
         // Création de quelques transactions
         Transaction transaction1 = new Transaction(account1.getAccountId(), "Achat", 100.0, LocalDateTime.now(), "debit");
@@ -81,6 +81,5 @@ public class Main {
         Map<String, Double> categoryAmounts = balanceCalculator.calculateCategoryAmounts(accountId, startDate, endDate);
         System.out.println("Restaurant Amount: " + categoryAmounts.get("restaurant"));
         System.out.println("Salaire Amount: " + categoryAmounts.get("salaire"));
-    }
     }
 }

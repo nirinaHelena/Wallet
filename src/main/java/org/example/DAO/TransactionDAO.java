@@ -19,7 +19,7 @@ public class TransactionDAO {
 
     public List<Transaction> findAll() {
         List<Transaction> transactionList = new ArrayList<>();
-        String sql = "SELECT * FROM \"transaction\" ;";
+        String sql = "SELECT * FROM transaction ;";
 
         try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
@@ -30,7 +30,8 @@ public class TransactionDAO {
                         resultSet.getString("transaction_label"),
                         resultSet.getDouble("transaction_amount"),
                         resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
-                        resultSet.getString("transaction_type")
+                        resultSet.getString("transaction_type"),
+                        resultSet.getInt("transaction_category")
                 ));
             }
         } catch (SQLException e) {
@@ -42,7 +43,7 @@ public class TransactionDAO {
     // find all transactions of an account
     public List<Transaction> findAllAtDate(int accountId) {
         List<Transaction> transactionList = new ArrayList<>();
-        String sql = "SELECT * FROM \"transaction\" where account_id = ? ;";
+        String sql = "SELECT * FROM transaction where account_id = ? ;";
 
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             preparedStatement.setObject(1, accountId);
@@ -55,7 +56,8 @@ public class TransactionDAO {
                             resultSet.getString("transaction_label"),
                             resultSet.getDouble("transaction_amount"),
                             resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
-                            resultSet.getString("transaction_type")
+                            resultSet.getString("transaction_type"),
+                            resultSet.getInt("transaction_category")
                     ));
                 }
             }
@@ -65,7 +67,7 @@ public class TransactionDAO {
         return transactionList;
     }
     public String  save(Transaction toSave) {
-        String sql = "INSERT INTO \"transaction\" (account_id, transaction_label, transaction_amount, transaction_type, exchange_rate) " +
+        String sql = "INSERT INTO transaction (account_id, transaction_label, transaction_amount, transaction_type, exchange_rate) " +
                 "VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
@@ -127,7 +129,8 @@ public class TransactionDAO {
                             resultSet.getString("transaction_label"),
                             resultSet.getDouble("transaction_amount"),
                             resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
-                            resultSet.getString("transaction_type")
+                            resultSet.getString("transaction_type"),
+                            resultSet.getInt("transaction_category")
                     ));
                 }
             }
@@ -141,7 +144,7 @@ public class TransactionDAO {
         List<Transaction> transactionList = new ArrayList<>();
         String sql = "SELECT * FROM transaction WHERE account_id = ? AND transaction_date_hour BETWEEN ? AND ?;";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
             preparedStatement.setObject(1, accountId);
             preparedStatement.setObject(2, startDate);
             preparedStatement.setObject(3, endDate);
@@ -149,12 +152,13 @@ public class TransactionDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     transactionList.add(new Transaction(
-                            (UUID) resultSet.getObject("transaction_id"),
-                            (UUID) resultSet.getObject("account_id"),
+                            resultSet.getInt("transaction_id"),
+                            resultSet.getInt("account_id"),
                             resultSet.getString("transaction_label"),
                             resultSet.getDouble("transaction_amount"),
                             resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
-                            resultSet.getString("transaction_type")
+                            resultSet.getString("transaction_type"),
+                            resultSet.getInt("transaction_category")
                     ));
                 }
             }

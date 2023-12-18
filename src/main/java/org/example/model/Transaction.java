@@ -18,7 +18,7 @@ public class Transaction {
     private LocalDateTime dateTime;
     private String transactionType;
     // type: debit or credit
-    private Category category;
+    private int category;
 
 
     public Transaction( int accountId, String transactionLabel, double amount,
