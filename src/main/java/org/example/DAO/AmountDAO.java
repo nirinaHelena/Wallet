@@ -39,12 +39,12 @@ public class AmountDAO {
 
 public Amount save(Amount toSave) {
 
-    String sql = "INSERT INTO amount (account_id, amount, datetime, currency_id, exchangeRate) VALUES (?, ?, ?, ?);";
+    String sql = "INSERT INTO amount (account_id, amount, datetime) VALUES (?, ?, ?);";
 
     try (PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql)) {
         preparedStatement.setObject(1, toSave.getAccountId());
         preparedStatement.setDouble(2, toSave.getAmount());
-        preparedStatement.setTimestamp(3, Timestamp.valueOf(toSave.getDateTime()));
+        preparedStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
 
         int rowAdded = preparedStatement.executeUpdate();
         if (rowAdded > 0) {
@@ -88,7 +88,7 @@ public Amount save(Amount toSave) {
             if (resultSet.next()) {
                 lastAmount = new Amount(
                         resultSet.getInt("account_id"),
-                        resultSet.getDouble("amount,"),
+                        resultSet.getDouble("amount"),
                         resultSet.getTimestamp("datetime").toLocalDateTime()
                 );
             }

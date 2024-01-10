@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class TransactionDAO {
 
@@ -19,6 +18,7 @@ public class TransactionDAO {
 
     public TransactionDAO() {
         this.connection = new DatabaseConnection();
+        this.amountDAO= new AmountDAO();
     }
 
     public List<Transaction> findAll() {
@@ -88,7 +88,6 @@ public class TransactionDAO {
 
             if (rowsAdded > 0) {
                 if (Objects.equals(toSave.getTransactionType(), "debit")){
-                    // TODO: check account exchangeRate
                     Double debitAmount= amountDAO.findLastAmount(toSave.getAccountId()).getAmount()
                             - toSave.getAmount();
 
@@ -117,7 +116,7 @@ public class TransactionDAO {
         }
         return null;
     }
-    public List<Transaction> findAllAtDate(UUID accountId, LocalDateTime date) {
+    public List<Transaction> findAllAtDate(int accountId, LocalDateTime date) {
         List<Transaction> transactionList = new ArrayList<>();
         String sql = "SELECT * FROM transaction WHERE account_id = ? AND DATE(transaction_date_hour) = ?;";
 

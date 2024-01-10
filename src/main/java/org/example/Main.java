@@ -1,13 +1,11 @@
 package org.example;
 
 import org.example.DAO.AccountDAO;
+import org.example.DAO.AmountDAO;
 import org.example.DAO.CurrencyDAO;
 import org.example.DAO.TransactionDAO;
 import org.example.Service.BalanceCalculator;
-import org.example.model.Account;
-import org.example.model.Category;
-import org.example.model.Currency;
-import org.example.model.Transaction;
+import org.example.model.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,10 +16,11 @@ import java.util.UUID;
 public class Main {
 
     public static void main(String[] args) {
-        {
+
             CurrencyDAO currencyDAO = new CurrencyDAO();
             AccountDAO accountDAO = new AccountDAO();
             TransactionDAO transactionDAO = new TransactionDAO();
+            AmountDAO amountDAO= new AmountDAO();
 
             /**
              // Création de quelques devises
@@ -58,20 +57,27 @@ public class Main {
             System.out.println(accountDAO.findAll());
             System.out.println("=".repeat(30));
 
+            System.out.println("=".repeat(30));
+            System.out.println("save an amount");
+            Amount amount1= new Amount(65, 200.0, LocalDateTime.now());
+            amountDAO.save(amount1);
+            Amount amount2= new Amount(66, 300.0, LocalDateTime.now());
+            System.out.println("=".repeat(30));
 
             // Création de quelques transactions
             System.out.println("=".repeat(30));
             System.out.println("save transaction");
 
-            Transaction transaction1 = new Transaction(65, "vente",
-                    100.0, null, "credit", 1);
+            Transaction transaction1 = new Transaction(66, "vente",
+                    100.0, LocalDateTime.now(), "credit", 4);
 
-            Transaction transaction2 = new Transaction(65, "achat",
-                    5.0, null, "debit", 1);
+            Transaction transaction2 = new Transaction(66, "achat",
+                    5.0, LocalDateTime.now(), "debit", 3);
             // Enregistrement des transactions dans la base de données
             System.out.println("save transaction 1");
             transactionDAO.save(transaction1);
             transactionDAO.save(transaction2);
+        System.out.println(amountDAO.findLastAmount(66));
 
             System.out.println("=".repeat(30));
             List <Account> allAccounts = accountDAO.findAll();
@@ -82,9 +88,11 @@ public class Main {
                 System.out.println("Solde de " + account.getAccountName() + ": " + currentBalance);
             }
 
+
             System.out.println("=".repeat(30));
             System.out.println("create category");
 
+            /**
             System.out.println("=".repeat(30));
 
             // Affichage des transactions de chaque compte
@@ -98,7 +106,9 @@ public class Main {
             }
             System.out.println("=".repeat(30));
             System.out.println("la balance de account1");
-        }
+             **/
+        System.out.println("=".repeat(30));
+        System.out.println(transactionDAO.findAll());
 
             System.out.println("=".repeat(30));
         BalanceCalculator balanceCalculator = new BalanceCalculator();
