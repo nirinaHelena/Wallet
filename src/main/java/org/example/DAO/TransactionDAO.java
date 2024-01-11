@@ -99,7 +99,6 @@ public class TransactionDAO {
                             + " merci de votre confiance";
                 }
                 if (Objects.equals(toSave.getTransactionType(), "credit")){
-                    // TODO: check account exchangeRate
                     Double creditAmount= amountDAO.findLastAmount(toSave.getAccountId()).getAmount()
                             + toSave.getAmount();
 
