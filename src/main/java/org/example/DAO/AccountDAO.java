@@ -2,6 +2,7 @@ package org.example.DAO;
 
 import org.example.databaseConfiguration.DatabaseConnection;
 import org.example.model.Account;
+import org.example.model.Amount;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -24,6 +25,20 @@ public class AccountDAO implements DAOInterface<Account>{
     // Trouve tous les comptes sans leurs montants et transactions associées
 
 
+    public int findAccountAddedId (){
+        String sql= " select * from account order by account_id DESC LIMIT 1; " ;
+
+        int idAccount = 0;
+        try (Statement statement = connection.getConnection().createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                idAccount= resultSet.getInt("account_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return idAccount;
+    }
     public List<Account> findAll() {
         List<Account> accountList = new ArrayList<>();
 
@@ -72,6 +87,8 @@ public class AccountDAO implements DAOInterface<Account>{
 
             int rowsAdded = preparedStatement.executeUpdate();
 
+            Amount amount= new Amount(findAccountAddedId(), 0.0, LocalDateTime.now());
+            amountDAO.save(amount);
             if (rowsAdded > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
@@ -143,7 +160,7 @@ public class AccountDAO implements DAOInterface<Account>{
     }
 
     // Affiche le solde à une date donnée
-    public double balanceAtADate(UUID accountId, LocalDateTime dateTime) {
+    public double balanceAtADate(int accountId, LocalDateTime dateTime) {
         double amount = 0;
 
         String sql = "SELECT amount FROM amount WHERE account_id = ? AND datetime <= ? ORDER BY datetime DESC LIMIT 1;";

@@ -20,14 +20,14 @@ public class AmountDAO {
     public List<Amount> findAll() {
         List<Amount> amountList = new ArrayList<>();
 
-        String sql= "SELECT FROM * amount";
+        String sql= "SELECT * FROM amount";
 
         try (Statement statement = connection.getConnection().createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()){
                 amountList.add(new Amount(
                         resultSet.getInt("account_id"),
-                        resultSet.getDouble("amount,"),
+                        resultSet.getDouble("amount"),
                         resultSet.getTimestamp("datetime").toLocalDateTime()
                 ));
             }

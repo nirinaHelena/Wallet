@@ -47,8 +47,8 @@ public class Main {
             Account account1 = new Account("courant", 2, "banque");
             Account account2 = new Account("courant", 1, "banque");
 
-            // Enregistrement des comptes dans la base de données
-            //accountDAO.saveAll(List.of(account1, account2));
+            /** Enregistrement des comptes dans la base de données **/
+            accountDAO.saveAll(List.of(account1, account2));
 
             System.out.println("=".repeat(30));
 
@@ -57,30 +57,27 @@ public class Main {
             System.out.println(accountDAO.findAll());
             System.out.println("=".repeat(30));
 
-            System.out.println("=".repeat(30));
-            System.out.println("save an amount");
-            Amount amount1= new Amount(65, 200.0, LocalDateTime.now());
-            amountDAO.save(amount1);
-            Amount amount2= new Amount(66, 300.0, LocalDateTime.now());
-            System.out.println("=".repeat(30));
-
             // Création de quelques transactions
             System.out.println("=".repeat(30));
             System.out.println("save transaction");
 
-            Transaction transaction1 = new Transaction(66, "vente",
+            Transaction transaction1 = new Transaction(67, "vente",
                     100.0, LocalDateTime.now(), "credit", 4);
 
-            Transaction transaction2 = new Transaction(66, "achat",
+            Transaction transaction2 = new Transaction(68, "achat",
                     5.0, LocalDateTime.now(), "debit", 3);
             // Enregistrement des transactions dans la base de données
             System.out.println("save transaction 1");
             transactionDAO.save(transaction1);
+        System.out.println("save transaction2");
             transactionDAO.save(transaction2);
-        System.out.println(amountDAO.findLastAmount(66));
+        System.out.println("find last amount of account 68");
+        System.out.println(amountDAO.findLastAmount(68));
 
             System.out.println("=".repeat(30));
             List <Account> allAccounts = accountDAO.findAll();
+        System.out.println("tous les comptes");
+        System.out.println(allAccounts);
             // Affichage du solde actuel de chaque compte
             System.out.println("\nSolde actuel de chaque compte : ");
             for (Account account : allAccounts) {
@@ -92,7 +89,7 @@ public class Main {
             System.out.println("=".repeat(30));
             System.out.println("create category");
 
-            /**
+
             System.out.println("=".repeat(30));
 
             // Affichage des transactions de chaque compte
@@ -105,8 +102,9 @@ public class Main {
                 }
             }
             System.out.println("=".repeat(30));
-            System.out.println("la balance de account1");
-             **/
+            System.out.println("liste des amount");
+        System.out.println(amountDAO.findAll());
+
         System.out.println("=".repeat(30));
         System.out.println(transactionDAO.findAll());
 
@@ -115,13 +113,13 @@ public class Main {
 
         // Exemple d'utilisation de la fonction calculateBalance
         LocalDateTime startDate = LocalDateTime.parse("2023-01-01T00:00:00");
-        LocalDateTime endDate = LocalDateTime.parse("2023-12-31T23:59:59");
+        LocalDateTime endDate = LocalDateTime.now();
 
-        double totalBalance = balanceCalculator.calculateBalance(5, startDate, endDate);
+        double totalBalance = balanceCalculator.calculateBalance(67, startDate, endDate);
         System.out.println("Total Balance: " + totalBalance);
 
         // Exemple d'utilisation de la fonction calculateCategoryAmounts
-        Map<String, Double> categoryAmounts = balanceCalculator.calculateCategoryAmounts(5, startDate, endDate);
+        Map<String, Double> categoryAmounts = balanceCalculator.calculateCategoryAmounts(67, startDate, endDate);
         System.out.println("Restaurant Amount: " + categoryAmounts.get("restaurant"));
         System.out.println("Salaire Amount: " + categoryAmounts.get("salaire"));
     }

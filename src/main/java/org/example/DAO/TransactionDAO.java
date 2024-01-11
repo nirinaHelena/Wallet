@@ -35,7 +35,7 @@ public class TransactionDAO {
                         resultSet.getDouble("transaction_amount"),
                         resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
                         resultSet.getString("transaction_type"),
-                        resultSet.getInt("transaction_category")
+                        resultSet.getInt("category_id")
                 ));
             }
         } catch (SQLException e) {
@@ -61,7 +61,7 @@ public class TransactionDAO {
                             resultSet.getDouble("transaction_amount"),
                             resultSet.getTimestamp("transaction_date_hour").toLocalDateTime(),
                             resultSet.getString("transaction_type"),
-                            resultSet.getInt("transaction_category")
+                            resultSet.getInt("category_id")
                     ));
                 }
             }
