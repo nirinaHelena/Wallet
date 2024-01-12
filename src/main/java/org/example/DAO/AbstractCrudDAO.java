@@ -80,7 +80,20 @@ public abstract class AbstractCrudDAO<T> implements CrudDAO<T> {
     };
 
     // Méthode abstraite pour obtenir les valeurs à insérer dans la requête SQL INSERT
-    protected abstract String getInsertValues();
+    private String getInsertValues(){
+        StringBuilder values = new StringBuilder("VALUES (");
+
+        Field[] fields = toSave.getClass()
+                .getDeclaredFields();
+    for (Field field : fields) {
+        values.append("?, ");
+    }
+
+    values.delete(values.length()-2, values.length());
+    values.append(")");
+
+        return values.toString();
+    }
 
     // Méthode abstraite pour définir les paramètres de la requête SQL INSERT
     protected abstract void setInsertParameters(PreparedStatement preparedStatement, T toSave);
