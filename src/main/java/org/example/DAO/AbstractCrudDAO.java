@@ -2,6 +2,7 @@ package org.example.DAO;
 
 import org.example.databaseConfiguration.DatabaseConnection;
 
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,7 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class AbstractCrudDAO<T> implements CrudDAO<T> {
+
     protected DatabaseConnection connection;
+    private T toSave;
 
     public AbstractCrudDAO() {
         this.connection = new DatabaseConnection();
@@ -46,7 +49,7 @@ public abstract class AbstractCrudDAO<T> implements CrudDAO<T> {
             int rowsAdded = preparedStatement.executeUpdate();
 
             if (rowsAdded > 0) {
-                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                try (var generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         int generatedId = generatedKeys.getInt(1);
                         return findById(generatedId);
@@ -62,8 +65,19 @@ public abstract class AbstractCrudDAO<T> implements CrudDAO<T> {
     // Méthode abstraite pour obtenir le nom de la table dans la base de données
     protected abstract String getTableName();
 
-    // Méthode abstraite pour obtenir les colonnes à insérer dans la requête SQL INSERT
-    protected abstract String getInsertColumns();
+    //Use  reflection for getting dynamicly the columns to insert
+    private String getInsertColumns(){
+        StringBuilder columns = new StringBuilder("(");
+
+        Field[] fields = toSave.getClass().getDeclaredFields();
+            for (Field field : fields){
+                columns.append(field.getName()).append(", ");
+            }
+            columns.delete(columns.length() - 2, columns.length()); //Remove last ','
+        columns.append(")");
+
+        return columns.toString();
+    };
 
     // Méthode abstraite pour obtenir les valeurs à insérer dans la requête SQL INSERT
     protected abstract String getInsertValues();
