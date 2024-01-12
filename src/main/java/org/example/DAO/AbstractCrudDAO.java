@@ -96,12 +96,22 @@ public abstract class AbstractCrudDAO<T> implements CrudDAO<T> {
     }
 
     // Méthode abstraite pour définir les paramètres de la requête SQL INSERT
-    protected abstract void setInsertParameters(PreparedStatement preparedStatement, T toSave);
+    private void setInsertParameters(PreparedStatement preparedStatement, T toSave) {
+        Field[] fields = toSave.getClass().getDeclaredFields();
+        int parameterIndex = 1;
+
+        for (Field field : fields){
+            try {
+                field.setAccessible(true);
+                Object value = field.get(toSave);
+                preparedStatement.setObject(parameterIndex++, value);
+            }catch  ( IllegalAccessException | SQLException e){
+                e.printStackTrace();
+            }
+        }
+    }
 
     // Méthode abstraite pour obtenir un enregistrement par son ID
     protected abstract T findById(int id);
-
-    // Méthode abstraite pour obtenir un enregistrement par un identifiant UUID
-    protected abstract T findById(UUID id);
 }
 
