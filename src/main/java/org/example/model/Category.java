@@ -7,12 +7,13 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
-public class Amount {
-    private int accountId;
-    private double amount;
-    private LocalDateTime dateTime;
+public class Category {
+    private UUID categoryId;
+    private String categoryNam;
+    private String categoryType;
+    // type: debit or credit
 }

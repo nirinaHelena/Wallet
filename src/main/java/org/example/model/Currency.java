@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Currency {
-    private UUID currencyId;
+    private int currencyId;
     private String currencyName;
     private String currencyCode;
 

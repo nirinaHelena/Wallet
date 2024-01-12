@@ -8,7 +8,27 @@ SELECT
     t.transaction_amount AS "MontantTransaction",
     t.transaction_date_hour AS "DateHeureTransaction",
     t.transaction_type AS "TypeTransaction",
-    c.currency_name AS "Devise",
+    c.currency_name AS "Devise",CREATE OR REPLACE FUNCTION calculate_category_amounts(
+    p_account_id INT,
+    p_start_date_hour TIMESTAMP,
+    p_end_date_hour TIMESTAMP
+) RETURNS TABLE (
+    restaurant DOUBLE PRECISION,
+    salaire DOUBLE PRECISION
+) AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT
+        COALESCE(SUM(CASE WHEN tc.category_name = 'restaurant' THEN t.transaction_amount ELSE 0 END), 0) AS restaurant,
+        COALESCE(SUM(CASE WHEN tc.category_name = 'salaire' THEN t.transaction_amount ELSE 0 END), 0) AS salaire
+    FROM transaction t
+    LEFT JOIN transaction_category tc ON t.category_id = tc.category_id
+    WHERE t.account_id = p_account_id
+        AND t.transaction_date_hour BETWEEN p_start_date_hour AND p_end_date_hour;
+END;
+$$ LANGUAGE plpgsql;
+
     a.account_type AS "Type"
 FROM
     account a

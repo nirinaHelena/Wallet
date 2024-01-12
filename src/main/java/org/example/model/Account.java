@@ -13,23 +13,23 @@ import java.util.UUID;
 @EqualsAndHashCode
 @ToString
 public class Account {
-    private UUID accountId;
+    private int accountId;
     private String accountName;
     private Amount amount;
     private List<Transaction> transactionList;
-    private Currency currency;
+    private int currency;
     private String accountType;
 
     // constructor without accountId and amount initial= 0.0
 
-    public Account(String accountName, Currency currency, String accountType) {
+    public Account(String accountName, int currency, String accountType) {
         this.accountName = accountName;
         this.currency = currency;
         this.accountType = accountType;
     }
 
     // constructor without amount and transaction list
-    public Account(UUID accountId, String accountName, Currency currency, String accountType) {
+    public Account(int accountId, String accountName, int currency, String accountType) {
         this.accountId = accountId;
         this.accountName = accountName;
         this.currency = currency;
